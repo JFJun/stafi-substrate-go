@@ -21,7 +21,7 @@ import (
 
 type Client struct {
 	C                  *gsrc.SubstrateAPI
-	meta               *types.Metadata
+	Meta               *types.Metadata
 	prefix             []byte //币种的前缀
 	SpecVersion        int
 	TransactionVersion int
@@ -51,7 +51,7 @@ func (c *Client) checkRuntimeVersion() error {
 	c.TransactionVersion = int(uint32(v.TransactionVersion))
 	specVersion := int(uint32(v.SpecVersion))
 	if specVersion != c.SpecVersion {
-		c.meta, err = c.C.RPC.State.GetMetadataLatest()
+		c.Meta, err = c.C.RPC.State.GetMetadataLatest()
 		if err != nil {
 			return fmt.Errorf("init metadata error: %v", err)
 		}
@@ -144,7 +144,7 @@ func (c *Client) parseExtrinsicByDecode(extrinsics []string, blockResp *models.B
 			return fmt.Errorf("hex.decode extrinsic error: %v", err)
 		}
 		decoder := scale.NewDecoder(bytes.NewReader(data))
-		ed, err := expand.NewExtrinsicDecoder(c.meta)
+		ed, err := expand.NewExtrinsicDecoder(c.Meta)
 		if err != nil {
 			return fmt.Errorf("new extrinsic decode error: %v", err)
 		}
@@ -270,7 +270,7 @@ func (c *Client) parseExtrinsicByStorage(blockHash string, blockResp *models.Blo
 		}
 	}()
 
-	storage, err = types.CreateStorageKey(c.meta, "System", "Events", nil, nil)
+	storage, err = types.CreateStorageKey(c.Meta, "System", "Events", nil, nil)
 	if err != nil {
 		return fmt.Errorf("create storage key error: %v", err)
 	}
@@ -282,7 +282,7 @@ func (c *Client) parseExtrinsicByStorage(blockHash string, blockResp *models.Blo
 	}
 	e := types.EventRecordsRaw(types.MustHexDecodeString(result.(string)))
 	var events types.EventRecords
-	err = e.DecodeEventRecords(c.meta, &events)
+	err = e.DecodeEventRecords(c.Meta, &events)
 	if err != nil {
 		return fmt.Errorf("decode event data error: %v", err)
 	}
@@ -392,7 +392,7 @@ func (c *Client) GetAccountInfo(address string) (*types.AccountInfo, error) {
 	if err != nil {
 		return nil, fmt.Errorf("ss58 decode address error: %v", err)
 	}
-	storage, err = types.CreateStorageKey(c.meta, "System", "Account", pub, nil)
+	storage, err = types.CreateStorageKey(c.Meta, "System", "Account", pub, nil)
 	if err != nil {
 		return nil, fmt.Errorf("create System.Account storage error: %v", err)
 	}
