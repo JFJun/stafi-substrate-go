@@ -60,16 +60,47 @@ func Test_Zstring(t *testing.T) {
 }
 
 func Test_GetAccountInfo(t *testing.T) {
-	c, err := client.New("wss://rpc.polkadot.io")
+	c, err := client.New("wss://mainnet-rpc.stafi.io")
+	//c, err := client.New("wss://rpc.polkadot.io")
+	c.SetPrefix(ss58.StafiPrefix)
 	if err != nil {
 		t.Fatal(err)
 	}
-	c.SetPrefix(ss58.PolkadotPrefix)
-	ai, err := c.GetAccountInfo("1exaAg2VJRQbyUBAeXcktChCAqjVP9TUxF3zo23R2T6EGdE")
+	//c.SetPrefix(ss58.StafiPrefix)
+	ai, err := c.GetAccountInfo("34mqJ3JebpbRfudQFH2uDKXNsKoNUX4AWuoTgJhronNcENCh")
 	if err != nil {
 		t.Fatal(err)
 	}
-	fmt.Println(uint32(ai.Nonce))
+	d, _ := json.Marshal(ai)
+	fmt.Println(string(d))
+	//fmt.Println(uint32(ai.Nonce))
+	//address:="32ZWhveKAYJp1CKbP7TZQUTqtcdDdGXcEYnsfDwdZ6Y3qMB3"
+	////address = "12KkURmLnQcQQRvVNm5cj5uaBtUL5LVQBXUwmQ6oBHBMLwkG"
+	//pub, err := ss58.DecodeToPub(address)
+	//if err != nil {
+	//	t.Fatal(err)
+	//}
+	//storage, err := types.CreateStorageKey(c.Meta, "System", "Account", pub, nil)
+	//if err != nil {
+	//	t.Fatal(err)
+	//}
+	//key:=storage.Hex()
+	//var res interface{}
+	//err = c.C.Client.Call(&res,"state_getStorageAt", key)
+	//if err != nil {
+	//	t.Fatal(err)
+	//}
+	//fmt.Println(res.(string))
+	//decoder:=scale.NewDecoder(bytes.NewReader(types.MustHexDecodeString(res.(string))))
+	//var ai types.AccountInfo
+	//err = decoder.Decode(&ai)
+	//if err != nil {
+	//	t.Fatal(err)
+	//}
+	//d,_:=json.Marshal(ai)
+	//fmt.Println(string(d))
+	//fis: 0x 30000000 00 fdff24a8131000000000000000000000 00000000000000000000000000000000 00000000000000000000000000000000 00000000000000000000000000000000
+	//dot: 0x 12000000 02000000 f571d256491b000000000000000000000 0000000000000000000000000000000 00e057eb481b00000000000000000000 00e057eb481b00000000000000000000
 }
 
 func Test_GetBlockByNumber(t *testing.T) {
@@ -79,7 +110,7 @@ func Test_GetBlockByNumber(t *testing.T) {
 	}
 	//types.SetSerDeOptions(types.SerDeOptions{NoPalletIndices: true})
 	c.SetPrefix(ss58.StafiPrefix)
-	resp, err := c.GetBlockByNumber(987114)
+	resp, err := c.GetBlockByNumber(995445)
 	if err != nil {
 		t.Fatal(err)
 	}

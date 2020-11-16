@@ -67,16 +67,16 @@ import (
 
 type Balance struct {
 	Reader io.Reader
-	Value 	decimal.Decimal
+	Value  decimal.Decimal
 }
 
-func (b *Balance)Decode(decoder scale.Decoder)error{
+func (b *Balance) Decode(decoder scale.Decoder) error {
 	buf := &bytes.Buffer{}
 	b.Reader = buf
-	data:=make([]byte,16)
+	data := make([]byte, 16)
 	err := decoder.Read(data)
 	if err != nil {
-		return fmt.Errorf("decode balance: read bytes error: %v",err)
+		return fmt.Errorf("decode balance: read bytes error: %v", err)
 	}
 	buf.Write(data)
 	c := make([]byte, 16)
@@ -88,35 +88,35 @@ func (b *Balance)Decode(decoder scale.Decoder)error{
 	return nil
 }
 
-
 type Vec struct {
-	Value 		[]interface{}
+	Value []interface{}
 }
+
 /*
 sub type must be struct,not ptr
 */
-func (v *Vec)ProcessVec(decoder scale.Decoder,subType interface{})error{
+func (v *Vec) ProcessVec(decoder scale.Decoder, subType interface{}) error {
 	var u types.UCompact
-	err:=decoder.Decode(&u)
+	err := decoder.Decode(&u)
 	if err != nil {
-		return fmt.Errorf("decode Vec: get length error: %v",err)
+		return fmt.Errorf("decode Vec: get length error: %v", err)
 	}
-	length:=int(utils.UCompactToBigInt(u).Int64())
-	if length>5000 {
+	length := int(utils.UCompactToBigInt(u).Int64())
+	if length > 5000 {
 		return fmt.Errorf("vec length %d exceeds %d", length, 1000)
 	}
-	for i:=0;i<length;i++ {
-		st:=reflect.TypeOf(subType)
-		if st.Kind()!=reflect.Struct {
+	for i := 0; i < length; i++ {
+		st := reflect.TypeOf(subType)
+		if st.Kind() != reflect.Struct {
 			return errors.New("decode Vec: struct type is not struct")
 		}
-		tmp:=reflect.New(st)
-		subType:=tmp.Interface()
+		tmp := reflect.New(st)
+		subType := tmp.Interface()
 		err = decoder.Decode(subType)
 		if err != nil {
-			return fmt.Errorf("decode Vec: decoder subtype error: %v",err)
+			return fmt.Errorf("decode Vec: decoder subtype error: %v", err)
 		}
-		v.Value = append(v.Value,subType)
+		v.Value = append(v.Value, subType)
 	}
 	return nil
 }
@@ -128,29 +128,29 @@ type TransferCall struct {
 	Value interface{}
 }
 
-func (t *TransferCall)Decode(decoder scale.Decoder)error{
+func (t *TransferCall) Decode(decoder scale.Decoder) error {
 	//1. 先获取callidx
-	b:=make([]byte,2)
+	b := make([]byte, 2)
 	err := decoder.Read(b)
 	if err != nil {
-		return fmt.Errorf("deode transfer call: read callIdx bytes error: %v",err)
+		return fmt.Errorf("deode transfer call: read callIdx bytes error: %v", err)
 	}
-	callIdx:=xstrings.RightJustify(utils.IntToHex(b[0]),2,"0")+xstrings.RightJustify(utils.IntToHex(b[1]),2,"0")
+	callIdx := xstrings.RightJustify(utils.IntToHex(b[0]), 2, "0") + xstrings.RightJustify(utils.IntToHex(b[1]), 2, "0")
 	result := map[string]interface{}{
-		"call_index":    callIdx,
+		"call_index": callIdx,
 	}
 	var param []ExtrinsicParam
 	// 0 ---> 	Address
 	var address Address
 	err = decoder.Decode(&address)
 	if err != nil {
-		return fmt.Errorf("decode call: decode Balances.transfer.Address error: %v",err)
+		return fmt.Errorf("decode call: decode Balances.transfer.Address error: %v", err)
 	}
 	param = append(param,
 		ExtrinsicParam{
-			Name: "dest",
-			Type: "Address",
-			Value: address.Value,
+			Name:     "dest",
+			Type:     "Address",
+			Value:    address.Value,
 			ValueRaw: address.Value,
 		})
 	// 1 ----> Compact<Balance>
@@ -158,13 +158,13 @@ func (t *TransferCall)Decode(decoder scale.Decoder)error{
 
 	err = decoder.Decode(&bb)
 	if err != nil {
-		return fmt.Errorf("decode call: decode Balances.transfer.Compact<Balance> error: %v",err)
+		return fmt.Errorf("decode call: decode Balances.transfer.Compact<Balance> error: %v", err)
 	}
-	v:=utils.UCompactToBigInt(bb).Int64()
+	v := utils.UCompactToBigInt(bb).Int64()
 	param = append(param,
 		ExtrinsicParam{
-			Name: "value",
-			Type: "Compact<Balance>",
+			Name:  "value",
+			Type:  "Compact<Balance>",
 			Value: v,
 		})
 	result["call_args"] = param
@@ -174,42 +174,56 @@ func (t *TransferCall)Decode(decoder scale.Decoder)error{
 
 type Address struct {
 	AccountLength string `json:"account_length"`
-	Value 		 string
+	Value         string
 }
-func (a *Address)Decode(decoder scale.Decoder)error{
-	al,err:=decoder.ReadOneByte()
+
+func (a *Address) Decode(decoder scale.Decoder) error {
+	al, err := decoder.ReadOneByte()
 	if err != nil {
-		return fmt.Errorf("decode address: get account length error: %v",err)
+		return fmt.Errorf("decode address: get account length error: %v", err)
 	}
 	a.AccountLength = utils.BytesToHex([]byte{al})
-	if a.AccountLength=="ff" {
-		data:=make([]byte,32)
+	if a.AccountLength == "ff" {
+		data := make([]byte, 32)
 		err = decoder.Read(data)
 		if err != nil {
-			return fmt.Errorf("decode address: get address 32 bytes error: %v",err)
+			return fmt.Errorf("decode address: get address 32 bytes error: %v", err)
 		}
 		a.Value = utils.BytesToHex(data)
 		return nil
 	}
-	d:=make([]byte,31)
+	d := make([]byte, 31)
 	err = decoder.Read(d)
 	if err != nil {
-		return fmt.Errorf("decode address: get address 31 bytes error: %v",err)
+		return fmt.Errorf("decode address: get address 31 bytes error: %v", err)
 	}
-	a.Value = utils.BytesToHex(append([]byte{al},d...))
+	a.Value = utils.BytesToHex(append([]byte{al}, d...))
 	return nil
 }
+
 //
 type U32 struct {
-	Value  uint32
+	Value uint32
 }
 
-func (u *U32)Decode(decoder scale.Decoder)error{
-	data:=make([]byte,4)
+func (u *U32) Decode(decoder scale.Decoder) error {
+	data := make([]byte, 4)
 	err := decoder.Read(data)
 	if err != nil {
-		return fmt.Errorf("decode u32 : read 4 bytes error: %v",err)
+		return fmt.Errorf("decode u32 : read 4 bytes error: %v", err)
 	}
 	u.Value = binary.LittleEndian.Uint32(data)
 	return nil
+}
+
+// AccountInfo contains information of an account
+type StafiAccountInfo struct {
+	Nonce    types.U32
+	Refcount types.U8
+	Data     struct {
+		Free       types.U128
+		Reserved   types.U128
+		MiscFrozen types.U128
+		FreeFrozen types.U128
+	}
 }

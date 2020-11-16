@@ -8,25 +8,24 @@ import (
 	"testing"
 )
 
-func Test_GetStorage(t *testing.T){
-	blockHash:="0x06b90d6b25eb33fb6b475027cd18d934551786cfe2a85e59f65fd519bd6f4905"
-	c,err:=client.New("wss://rpc.polkadot.io")
+func Test_GetStorage(t *testing.T) {
+	blockHash := "0xcc363d1603333910d93c10ae4a993a69055ac77dc6df6e69f67b55f4f19b8d55"
+	c, err := client.New("wss://mainnet-rpc.stafi.io")
 	if err != nil {
 		t.Fatal(err)
 	}
-	meta,err:=c.C.RPC.State.GetMetadataLatest()
+	meta, err := c.C.RPC.State.GetMetadataLatest()
 	if err != nil {
 		t.Fatal(err)
 	}
-	storage,err:=types.CreateStorageKey(meta,"System","Events",nil,nil)
+	storage, err := types.CreateStorageKey(meta, "System", "Events", nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-
-	key:=storage.Hex()
+	key := storage.Hex()
 	var r interface{}
-	err = c.C.Client.Call(&r,"state_getStorage",key,blockHash)
+	err = c.C.Client.Call(&r, "state_getStorage", key, blockHash)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -37,6 +36,6 @@ func Test_GetStorage(t *testing.T){
 	if err != nil {
 		t.Fatal(err)
 	}
-	dd,_:=json.Marshal(events)
+	dd, _ := json.Marshal(events)
 	fmt.Println(string(dd))
 }
