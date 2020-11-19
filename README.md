@@ -3,7 +3,7 @@
     1. 该包不仅可用于stafi的区块解析以及离线签名，还可以用于polkadot以及substrate其他的链，目前暂不支持dawinia链
     2. 这个包其实是对github.com/JFJun/substrate-go包的升级，所以功能与两者相似，只不过这个包更简洁更稳定。
 ## 使用
-###1. 解析区块
+### 1. 解析区块
         // 初始化客户端
         c, err := client.New("wss://rpc.polkadot.io")
     	if err != nil {
@@ -19,7 +19,7 @@
     	d, _ := json.Marshal(resp)
     	fmt.Println(string(d))
         
-###2. Balances.transfer转账
+### 2. Balances.transfer转账
     // 1. 初始化客户端
     c,err:=client.New("wss://crab.darwinia.network")
     if err != nil {
@@ -53,7 +53,7 @@
     txid:=result.(string)
     fmt.Println(txid)
 
-### Balances.transfer_keep_alive转账
+### 3. Balances.transfer_keep_alive转账
     *** 这个转账模式我没有试过，不过按理来说适合Balances.transfer一样的 ***
     将Balances.transfer中的第5部获取callIdx改为
     callIdx,err:=ed.MV.GetCallIndex("Balances","transfer_keep_alive")
@@ -62,7 +62,7 @@
         }
     其他的都和Balances.transfer一样
     
-### Utility.batch转账
+### 4. Utility.batch转账
     将Balances.transfer的第四部改为：
     pa:=map[string]int64{
         "to1":amount1,
