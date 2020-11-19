@@ -9,7 +9,7 @@ import (
 )
 
 func Test_GetStorage(t *testing.T) {
-	blockHash := "0xcc363d1603333910d93c10ae4a993a69055ac77dc6df6e69f67b55f4f19b8d55"
+	blockHash := "0x02c5ac1e520188c91fee16a27a1627dfbe8e5f6d349cae87e2889beece19ec9f"
 	c, err := client.New("wss://mainnet-rpc.stafi.io")
 	if err != nil {
 		t.Fatal(err)

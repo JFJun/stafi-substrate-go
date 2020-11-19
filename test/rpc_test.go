@@ -1,12 +1,16 @@
 package test
 
 import (
+	"bytes"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"github.com/JFJun/go-substrate-crypto/ss58"
 	"github.com/JFJun/stafi-substrate-go/client"
 	"github.com/JFJun/stafi-substrate-go/expand"
 	"github.com/JFJun/stafi-substrate-go/models"
+	"github.com/stafiprotocol/go-substrate-rpc-client/scale"
+	"github.com/stafiprotocol/go-substrate-rpc-client/types"
 	"testing"
 )
 
@@ -16,7 +20,7 @@ func Test_RpcClient(t *testing.T) {
 		t.Fatal(err)
 	}
 	var block models.SignedBlock
-	err = c.C.Client.Call(&block, "chain_getBlock", "0xcbf137e5da22eed249580356c3c5cd074ad0e2d7621906ae4a30687a14f2da4c")
+	err = c.C.Client.Call(&block, "chain_getBlock", "0x9832ff45a5d135a37518459cbab3331331e6ae30a0aa6298be4e03ea6c42f71b")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -67,7 +71,7 @@ func Test_GetAccountInfo(t *testing.T) {
 		t.Fatal(err)
 	}
 	//c.SetPrefix(ss58.StafiPrefix)
-	ai, err := c.GetAccountInfo("34mqJ3JebpbRfudQFH2uDKXNsKoNUX4AWuoTgJhronNcENCh")
+	ai, err := c.GetAccountInfo("32qwhN8jf2nqa8nh6rjLhbfJ8kRjb1TgYFeLQyvRT8yPcNFr")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -104,13 +108,13 @@ func Test_GetAccountInfo(t *testing.T) {
 }
 
 func Test_GetBlockByNumber(t *testing.T) {
-	c, err := client.New("wss://mainnet-rpc.stafi.io")
+	c, err := client.New("wss://rpc.polkadot.io")
 	if err != nil {
 		t.Fatal(err)
 	}
 	//types.SetSerDeOptions(types.SerDeOptions{NoPalletIndices: true})
 	c.SetPrefix(ss58.StafiPrefix)
-	resp, err := c.GetBlockByNumber(995445)
+	resp, err := c.GetBlockByNumber(2517230)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -124,6 +128,86 @@ func Test_GetGenesisHash(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Println(c.GetGenesisHash())
+}
+
+func Test_CalcFee(t *testing.T) {
+	c, err := client.New("wss://mainnet-rpc.stafi.io")
+	//c, err := client.New("wss://rpc.polkadot.io")
+	c.SetPrefix(ss58.StafiPrefix)
+	if err != nil {
+		t.Fatal(err)
+	}
+	md, err := expand.NewMetadataExpand(c.Meta)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, value, err := md.MV.GetConstants("TransactionPayment", "TransactionByteFee")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var tbf types.U128
+	decoder := scale.NewDecoder(bytes.NewReader(value))
+	err = decoder.Decode(&tbf)
+	if err != nil {
+		t.Fatal(err)
+	}
+	transactionByteFee := tbf.Uint64()
+	fmt.Println("pre_Bytes:", transactionByteFee)
+
+	_, value2, err := md.MV.GetConstants("System", "ExtrinsicBaseWeight")
+	var w types.U32
+	decoder2 := scale.NewDecoder(bytes.NewReader(value2))
+	err = decoder2.Decode(&w)
+	if err != nil {
+		t.Fatal(err)
+	}
+	extrinsicBaseWeight := int64(w)
+	fmt.Println("extrinsicWeight:", extrinsicBaseWeight)
+
+	storage, err := types.CreateStorageKey(c.Meta, "TransactionPayment", "NextFeeMultiplier", nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var weight types.U128
+	data, _ := hex.DecodeString("db78f4f0026651e6d85e32d9601a92571e107b7c907d85ea606d3cc12a7285bf")
+	prehash := types.NewHash(data)
+	ok, err := c.C.RPC.State.GetStorage(storage, &weight, prehash)
+	if err != nil {
+		t.Fatal(err)
+	}
+	//var r interface{}
+	//err = c.C.Client.Call(&r,"state_getStorageAt",storage.Hex(),"0x822ad83fdad1b40ed35159b1e32c8b5d32d3e034b08bf2e9ebde18f3141004b9")
+	//if err != nil {
+	//	t.Fatal(err)
+	//}
+	//fmt.Println("R: ",r)
+	//rH:=r.(string)
+	//rH = strings.TrimPrefix(rH,"0x")
+	//dd,_:=hex.DecodeString(rH)
+	//fmt.Println(dd)
+	if !ok {
+		t.Fatal(111)
+	}
+	fmt.Println("WeightMultiplier: ", weight)
+	_, value3, err := md.MV.GetConstants("TransactionPayment", "WeightToFee")
+	if err != nil {
+		t.Fatal(err)
+	}
+	decoder3 := scale.NewDecoder(bytes.NewReader(value3))
+	vec := new(expand.Vec)
+	var wtfc expand.WeightToFeeCoefficient
+	err = vec.ProcessVec(*decoder3, wtfc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	d, _ := json.Marshal(vec.Value)
+	fmt.Println("WTFC:", string(d))
+	vv := vec.Value[0]
+	hj := vv.(*expand.WeightToFeeCoefficient)
+	cf := expand.NewCalcFee(hj, extrinsicBaseWeight, int64(transactionByteFee), int64(weight.Int64()))
+	fee := cf.CalcPartialFee(190949000, 143)
+	fmt.Println(fee)
 }
 
 // 1700dcea9317bceb28b52bdae9229a3794de4ca85e36d990a78f779c6fd7f27eb54102890700003c001c0000000300000034f61bfda344b3fad3c3e38832a91448b3c613b199eb23e5110a635d71c13c6534f61bfda344b3fad3c3e38832a91448b3c613b199eb23e5110a635d71c13c65

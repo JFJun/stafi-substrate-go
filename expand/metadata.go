@@ -15,23 +15,25 @@ import (
 */
 type MetadataExpand struct {
 	meta *types.Metadata
-	MV 	iMetaVersion
+	MV   iMetaVersion
 }
 type iMetaVersion interface {
 	GetCallIndex(moduleName, fn string) (callIdx string, err error)
-	FindNameByCallIndex(callIdx string)(moduleName, fn string,err error)
+	FindNameByCallIndex(callIdx string) (moduleName, fn string, err error)
+	GetConstants(modName, constantsName string) (constantsType string, constantsValue []byte, err error)
 }
-func NewMetadataExpand(meta *types.Metadata)(*MetadataExpand,error){
-	me :=new(MetadataExpand)
+
+func NewMetadataExpand(meta *types.Metadata) (*MetadataExpand, error) {
+	me := new(MetadataExpand)
 	me.meta = meta
 	if meta.IsMetadataV11 {
 		me.MV = newV11(meta.AsMetadataV11.Modules)
-	}else if meta.IsMetadataV12 {
+	} else if meta.IsMetadataV12 {
 		me.MV = newV12(meta.AsMetadataV12.Modules)
-	}else{
-		return nil,errors.New("metadata version is not v11 or v12")
+	} else {
+		return nil, errors.New("metadata version is not v11 or v12")
 	}
-	return me,nil
+	return me, nil
 }
 
 type v11 struct {
@@ -46,8 +48,8 @@ func (v v11) GetCallIndex(moduleName, fn string) (callIdx string, err error) {
 			err = fmt.Errorf("catch panic ,err=%v", errs)
 		}
 	}()
-	mi:=uint8(0)
-	for _,mod :=range  v.module{
+	mi := uint8(0)
+	for _, mod := range v.module {
 		if !mod.HasCalls {
 			continue
 		}
@@ -55,9 +57,9 @@ func (v v11) GetCallIndex(moduleName, fn string) (callIdx string, err error) {
 			mi++
 			continue
 		}
-		for ci,f:=range mod.Calls{
-			if string(f.Name)==fn {
-				return xstrings.RightJustify(utils.IntToHex(mi), 2, "0") + xstrings.RightJustify(utils.IntToHex(ci), 2, "0"),nil
+		for ci, f := range mod.Calls {
+			if string(f.Name) == fn {
+				return xstrings.RightJustify(utils.IntToHex(mi), 2, "0") + xstrings.RightJustify(utils.IntToHex(ci), 2, "0"), nil
 			}
 		}
 	}
@@ -65,66 +67,88 @@ func (v v11) GetCallIndex(moduleName, fn string) (callIdx string, err error) {
 }
 
 func (v v11) FindNameByCallIndex(callIdx string) (moduleName, fn string, err error) {
-	if len(callIdx)!=4 {
-		return "", "", fmt.Errorf("call index length is not equal 4: length: %d",len(callIdx))
+	if len(callIdx) != 4 {
+		return "", "", fmt.Errorf("call index length is not equal 4: length: %d", len(callIdx))
 	}
-	data,err:=hex.DecodeString(callIdx)
+	data, err := hex.DecodeString(callIdx)
 	if err != nil {
-		return "","",fmt.Errorf("call index is not hex string")
+		return "", "", fmt.Errorf("call index is not hex string")
 	}
-	mi:=int(data[0])
-	ci:=int(data[1])
-	for i,mod:=range v.module{
+	mi := int(data[0])
+	ci := int(data[1])
+	for i, mod := range v.module {
 		if !mod.HasCalls {
 			continue
 		}
-		if i==int(mi) {
+		if i == int(mi) {
 
-			for j,call:=range mod.Calls{
-				if j==int(ci){
-					moduleName=string(mod.Name)
+			for j, call := range mod.Calls {
+				if j == int(ci) {
+					moduleName = string(mod.Name)
 					fn = string(call.Name)
 					return
 				}
 			}
 		}
 	}
-	return "", "", fmt.Errorf("do not find this callInx info: %s",callIdx)
+	return "", "", fmt.Errorf("do not find this callInx info: %s", callIdx)
 }
 
-func newV11(module []types.ModuleMetadataV10)*v11{
-	v:=new(v11)
+func (v v11) GetConstants(modName, constantsName string) (constantsType string, constantsValue []byte, err error) {
+	defer func() {
+		if errs := recover(); errs != nil {
+			err = fmt.Errorf("catch panic ,err=%v", errs)
+		}
+	}()
+	for _, mod := range v.module {
+		if modName == string(mod.Name) {
+			for _, constants := range mod.Constants {
+				if string(constants.Name) == constantsName {
+					constantsType = string(constants.Type)
+					constantsValue = constants.Value
+					return constantsType, constantsValue, nil
+				}
+			}
+		}
+	}
+	return "", nil, fmt.Errorf("do not find this constants,moduleName=%s,"+
+		"constantsName=%s", modName, constantsName)
+}
+
+func newV11(module []types.ModuleMetadataV10) *v11 {
+	v := new(v11)
 	v.module = module
 	return v
 }
+
 type v12 struct {
 	module []types.ModuleMetadataV12
 }
 
 func (v v12) FindNameByCallIndex(callIdx string) (moduleName, fn string, err error) {
-	if len(callIdx)!=4 {
-		return "", "", fmt.Errorf("call index length is not equal 4: length: %d",len(callIdx))
+	if len(callIdx) != 4 {
+		return "", "", fmt.Errorf("call index length is not equal 4: length: %d", len(callIdx))
 	}
-	data,err:=hex.DecodeString(callIdx)
+	data, err := hex.DecodeString(callIdx)
 	if err != nil {
-		return "","",fmt.Errorf("call index is not hex string")
+		return "", "", fmt.Errorf("call index is not hex string")
 	}
-	for _,mod:=range v.module{
+	for _, mod := range v.module {
 		if !mod.HasCalls {
 			continue
 		}
-		if mod.Index==data[0] {
+		if mod.Index == data[0] {
 
-			for j,call:=range mod.Calls{
-				if j==int(data[1]){
-					moduleName=string(mod.Name)
+			for j, call := range mod.Calls {
+				if j == int(data[1]) {
+					moduleName = string(mod.Name)
 					fn = string(call.Name)
 					return
 				}
 			}
 		}
 	}
-	return "", "", fmt.Errorf("do not find this callInx info: %s",callIdx)
+	return "", "", fmt.Errorf("do not find this callInx info: %s", callIdx)
 }
 
 func (v v12) GetCallIndex(moduleName, fn string) (callIdx string, err error) {
@@ -135,7 +159,7 @@ func (v v12) GetCallIndex(moduleName, fn string) (callIdx string, err error) {
 			err = fmt.Errorf("catch panic ,err=%v", errs)
 		}
 	}()
-	for _,mod :=range  v.module{
+	for _, mod := range v.module {
 		if !mod.HasCalls {
 			continue
 		}
@@ -143,20 +167,37 @@ func (v v12) GetCallIndex(moduleName, fn string) (callIdx string, err error) {
 
 			continue
 		}
-		for ci,f:=range mod.Calls{
-			if string(f.Name)==fn {
-				return xstrings.RightJustify(utils.IntToHex(mod.Index),2,"0")+xstrings.RightJustify(utils.IntToHex(ci),2,"0"),nil
+		for ci, f := range mod.Calls {
+			if string(f.Name) == fn {
+				return xstrings.RightJustify(utils.IntToHex(mod.Index), 2, "0") + xstrings.RightJustify(utils.IntToHex(ci), 2, "0"), nil
 			}
 		}
 	}
 	return "", fmt.Errorf("do not find this call index")
 }
+func (v v12) GetConstants(modName, constantsName string) (constantsType string, constantsValue []byte, err error) {
+	defer func() {
+		if errs := recover(); errs != nil {
+			err = fmt.Errorf("catch panic ,err=%v", errs)
+		}
+	}()
+	for _, mod := range v.module {
+		if modName == string(mod.Name) {
+			for _, constants := range mod.Constants {
+				if string(constants.Name) == constantsName {
+					constantsType = string(constants.Type)
+					constantsValue = constants.Value
+					return constantsType, constantsValue, nil
+				}
+			}
+		}
+	}
+	return "", nil, fmt.Errorf("do not find this constants,moduleName=%s,"+
+		"constantsName=%s", modName, constantsName)
+}
 
-func newV12(module []types.ModuleMetadataV12)*v12{
-	v:=new(v12)
+func newV12(module []types.ModuleMetadataV12) *v12 {
+	v := new(v12)
 	v.module = module
 	return v
 }
-
-
-

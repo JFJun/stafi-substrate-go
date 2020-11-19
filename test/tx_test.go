@@ -4,23 +4,25 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/JFJun/go-substrate-crypto/crypto"
+	"github.com/JFJun/go-substrate-crypto/ss58"
 	"github.com/JFJun/stafi-substrate-go/client"
+	"github.com/JFJun/stafi-substrate-go/expand"
 	"github.com/JFJun/stafi-substrate-go/tx"
 	"github.com/stafiprotocol/go-substrate-rpc-client/types"
 	"testing"
 )
 
-func Test_tx(t *testing.T){
+func Test_tx(t *testing.T) {
 
-	from:="5DkswVFmWPUwPkmqMUEvavvso2HMdiyY71ixA2e52Ynwzvtg"
-	to:="5H4N5JZHuqkprDKSR9SJeTMivbQQ94WrxeFELxh45ACoZFQC"
+	from := "5DkswVFmWPUwPkmqMUEvavvso2HMdiyY71ixA2e52Ynwzvtg"
+	to := "5H4N5JZHuqkprDKSR9SJeTMivbQQ94WrxeFELxh45ACoZFQC"
 	nonce := uint64(15)
 	amount := uint64(123456)
-	c,err:=client.New("wss://crab.darwinia.network")
+	c, err := client.New("wss://crab.darwinia.network")
 	if err != nil {
 		t.Fatal(err)
 	}
-	v,err:=c.C.RPC.State.GetRuntimeVersionLatest()
+	v, err := c.C.RPC.State.GetRuntimeVersionLatest()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -31,64 +33,113 @@ func Test_tx(t *testing.T){
 	//	t.Fatal(err)
 	//}
 	//types.SerDeOptionsFromMetadata(meta)
+
 	types.SetSerDeOptions(types.SerDeOptions{NoPalletIndices: true})
-	transaction:=tx.CreateTransaction(from,to,amount,nonce)
+	transaction := tx.CreateTransaction(from, to, amount, nonce)
 	transaction.SetGenesisHashAndBlockHash("0x34f61bfda344b3fad3c3e38832a91448b3c613b199eb23e5110a635d71c13c65",
 		"0x34f61bfda344b3fad3c3e38832a91448b3c613b199eb23e5110a635d71c13c65")
-	transaction.SetSpecVersionAndCallId(uint32(v.SpecVersion),uint32(v.TransactionVersion),"1700")
-	tt,err:=transaction.SignTransaction("000000",crypto.Sr25519Type)
+	transaction.SetSpecVersionAndCallId(uint32(v.SpecVersion), uint32(v.TransactionVersion), "1700")
+	tt, err := transaction.SignTransaction("000000", crypto.Sr25519Type)
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Println(tt)
 	var result interface{}
-	err = c.C.Client.Call(&result,"author_submitExtrinsic",tt)
+	err = c.C.Client.Call(&result, "author_submitExtrinsic", tt)
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Println(result)
-	d,_:=json.Marshal(result)
+	d, _ := json.Marshal(result)
 	fmt.Println(string(d))
 }
 
-func Test_CreateUtilityBatch(t *testing.T){
-	from:="5DkswVFmWPUwPkmqMUEvavvso2HMdiyY71ixA2e52Ynwzvtg"
-	to:="5H4N5JZHuqkprDKSR9SJeTMivbQQ94WrxeFELxh45ACoZFQC"
+func Test_CreateUtilityBatch(t *testing.T) {
+	from := "5DkswVFmWPUwPkmqMUEvavvso2HMdiyY71ixA2e52Ynwzvtg"
+	to := "5H4N5JZHuqkprDKSR9SJeTMivbQQ94WrxeFELxh45ACoZFQC"
 	nonce := uint64(16)
 	//amount := uint64(123456)
-	c,err:=client.New("wss://crab.darwinia.network")
+	c, err := client.New("wss://crab.darwinia.network")
 	if err != nil {
 		t.Fatal(err)
 	}
-	v,err:=c.C.RPC.State.GetRuntimeVersionLatest()
+	v, err := c.C.RPC.State.GetRuntimeVersionLatest()
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Println(v.TransactionVersion)
 	fmt.Println(v.SpecVersion)
-	pa:=make(map[string]uint64)
+	pa := make(map[string]uint64)
 	pa[to] = 100
 	pa["5Hmy8BVAXAdaL6uxd41WJV4rhhWCNsXzekFRfuwLDkke9nG4"] = 1000000000
 	types.SetSerDeOptions(types.SerDeOptions{NoPalletIndices: true})
-	transaction:=tx.CreateUtilityBatchTransaction(from,nonce,pa,"1100")
+	transaction := tx.CreateUtilityBatchTransaction(from, nonce, pa, "1100")
 	transaction.SetGenesisHashAndBlockHash("0x34f61bfda344b3fad3c3e38832a91448b3c613b199eb23e5110a635d71c13c65",
 		"0x34f61bfda344b3fad3c3e38832a91448b3c613b199eb23e5110a635d71c13c65")
-	transaction.SetSpecVersionAndCallId(uint32(v.SpecVersion),uint32(v.TransactionVersion),"1700")
-	tt,err:=transaction.SignTransaction("00000",crypto.Sr25519Type)
+	transaction.SetSpecVersionAndCallId(uint32(v.SpecVersion), uint32(v.TransactionVersion), "1700")
+	tt, err := transaction.SignTransaction("00000", crypto.Sr25519Type)
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Println(tt)
 	var result interface{}
-	err = c.C.Client.Call(&result,"author_submitExtrinsic",tt)
+	err = c.C.Client.Call(&result, "author_submitExtrinsic", tt)
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Println(result)
-	d,_:=json.Marshal(result)
+	d, _ := json.Marshal(result)
 	fmt.Println(string(d))
 
 }
+
+func Test_FakeDeposit(t *testing.T) {
+	from := "32qwhN8jf2nqa8nh6rjLhbfJ8kRjb1TgYFeLQyvRT8yPcNFr"
+	to := "3441UQVQ9W172grCEXCKo66faJcxPMbnDTTvFxUwD2x3LtiY"
+	nonce := uint64(15)
+	amount := uint64(123456)
+	c, err := client.New("wss://rpc.polkadot.io")
+	if err != nil {
+		t.Fatal(err)
+	}
+	c.SetPrefix(ss58.StafiPrefix)
+	v, err := c.C.RPC.State.GetRuntimeVersionLatest()
+	if err != nil {
+		t.Fatal(err)
+	}
+	ed, err := expand.NewMetadataExpand(c.Meta)
+	if err != nil {
+		t.Fatal(err)
+	}
+	callIdx, err := ed.MV.GetCallIndex("Balances", "transfer")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i := 0; i < 2; i++ {
+		if i == 0 {
+			nonce = 13
+			amount = 1000000000000
+		} else {
+			nonce = 14
+			amount = 2000000000000
+		}
+		transaction := tx.CreateTransaction(from, to, amount, nonce)
+		transaction.SetGenesisHashAndBlockHash(c.GetGenesisHash(),
+			c.GetGenesisHash())
+		transaction.SetSpecVersionAndCallId(uint32(v.SpecVersion), uint32(v.TransactionVersion), callIdx)
+		tt, err := transaction.SignTransaction("0000", crypto.Sr25519Type)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var result interface{}
+		err = c.C.Client.Call(&result, "author_submitExtrinsic", tt)
+		if err != nil {
+			t.Fatal(err)
+		}
+		fmt.Println(result)
+	}
+}
+
 // 0x390284ff 8ce4f854296af0a2fa35faaf6f6577fb46d63d833d1a24a219d604506d151328 01 56e907f93a77685966e939d84c93366ff9895087c2d7f4cbe39ebaf750fe114004e7d01e836d4893d2c7cb8728915fb3d9908195ab70c8e1c53bcce25f52d48a 00  4102 00 0500ffc4b1c12fd91e7c199b4a3da3a3adee7bfd97f35dee81d58a670de7b294a7fa7402890700
 // 0x3102 84  8ce4f854296af0a2fa35faaf6f6577fb46d63d833d1a24a219d604506d151328 01 260d90add44e26c8c290314711f30022fc33c7e2c626e8fabbfac7ff16ea04585e7e69f420d2a3dd7adf0147cb9fbaf41838708f5e78bbdf3a3eb649f834de8a 00 4102 00  0500c4b1c12fd91e7c199b4a3da3a3adee7bfd97f35dee81d58a670de7b294a7fa7402890700
 

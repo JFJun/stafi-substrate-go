@@ -1,5 +1,6 @@
 package client
 
+import "C"
 import (
 	"bytes"
 	"encoding/hex"
@@ -17,6 +18,7 @@ import (
 	"golang.org/x/crypto/blake2b"
 	"log"
 	"strconv"
+	"strings"
 )
 
 type Client struct {
@@ -118,9 +120,9 @@ func (c *Client) GetBlockByHash(blockHash string) (*models.BlockResponse, error)
 }
 
 type parseBlockExtrinsicParams struct {
-	from, to, sig, era, txid string
-	nonce                    int64
-	extrinsicIdx             int
+	from, to, sig, era, txid, fee string
+	nonce                         int64
+	extrinsicIdx, length          int
 }
 
 func (c *Client) parseExtrinsicByDecode(extrinsics []string, blockResp *models.BlockResponse) error {
@@ -177,7 +179,10 @@ func (c *Client) parseExtrinsicByDecode(extrinsics []string, blockResp *models.B
 				blockData.sig = resp.Signature
 				blockData.nonce = resp.Nonce
 				blockData.extrinsicIdx = i
+				blockData.fee, err = c.GetPartialFee(extrinsic, blockResp.ParentHash)
+
 				blockData.txid = c.createTxHash(extrinsic)
+				blockData.length = resp.Length
 				for _, param := range resp.Params {
 					if param.Name == "dest" {
 
@@ -213,6 +218,7 @@ func (c *Client) parseExtrinsicByDecode(extrinsics []string, blockResp *models.B
 													blockData.sig = resp.Signature
 													blockData.nonce = resp.Nonce
 													blockData.extrinsicIdx = i
+													blockData.fee, _ = c.GetPartialFee(extrinsic, blockResp.ParentHash)
 													blockData.txid = c.createTxHash(extrinsic)
 													blockData.to, _ = ss58.EncodeByPubHex(arg.ValueRaw, c.prefix)
 													params = append(params, blockData)
@@ -241,19 +247,19 @@ func (c *Client) parseExtrinsicByDecode(extrinsics []string, blockResp *models.B
 	}
 	blockResp.Extrinsic = make([]*models.ExtrinsicResponse, len(params))
 	for idx, param := range params {
-		// write by jun 2020/06/18
-		// 避免不同高度出现相同txid的情况  详情高度： 552851  552911
-		//txid := fmt.Sprintf("%s_%d-%d", param.txid, blockResp.Height, param.extrinsicIdx)
 		e := new(models.ExtrinsicResponse)
 		e.Signature = param.sig
 		e.FromAddress = param.from
 		e.ToAddress = param.to
 		e.Nonce = param.nonce
 		e.Era = param.era
+		e.Fee = param.fee
 		e.ExtrinsicIndex = param.extrinsicIdx
 		//e.Txid = txid
 		e.Txid = param.txid
+		e.ExtrinsicLength = param.length
 		blockResp.Extrinsic[idx] = e
+
 	}
 	//utils.CheckStructData(blockResp)
 	return nil
@@ -317,9 +323,9 @@ func (c *Client) parseExtrinsicByStorage(blockHash string, blockResp *models.Blo
 				continue
 			}
 			r.Amount = decimal.NewFromInt(ebt.Value.Int64()).String()
+			r.Weight = c.getWeight(&events, r.ExtrinsicIdx)
 			res = append(res, r)
 		}
-
 	}
 	for _, e := range blockResp.Extrinsic {
 		e.Status = "fail"
@@ -337,7 +343,7 @@ func (c *Client) parseExtrinsicByStorage(blockHash string, blockResp *models.Blo
 						e.Amount = r.Amount
 						e.ToAddress = r.To
 						//计算手续费
-						e.Fee = c.calcFee(&events, e.ExtrinsicIndex)
+						//e.Fee = c.calcFee(&events, e.ExtrinsicIndex)
 					} else {
 						e.Status = fmt.Sprintf("to address is not equal,a1=[%s],a2=[%s]", e.ToAddress, r.To)
 					}
@@ -348,6 +354,7 @@ func (c *Client) parseExtrinsicByStorage(blockHash string, blockResp *models.Blo
 
 	return nil
 }
+
 func (c *Client) calcFee(events *types.EventRecords, extrinsicIdx int) string {
 	var (
 		fee = decimal.Zero
@@ -414,4 +421,72 @@ func (c *Client) GetAccountInfo(address string) (*types.AccountInfo, error) {
 		}
 	}
 	return &accountInfo, nil
+}
+
+//func (c *Client)calcFee2(blockResp *models.BlockResponse,weight,len int64)(string,error){
+//	var parentHash,parentParentHash 	types.Hash
+//	var err error
+//	parentHash,err = types.NewHashFromHexString(blockResp.ParentHash)
+//	if err != nil {
+//		return "", fmt.Errorf("new parent  hash error:%v",err)
+//	}
+//	if blockResp.Height>1 {
+//		header,err:=c.C.RPC.Chain.GetHeader(parentHash)
+//		if err != nil {
+//			return "", fmt.Errorf("get parent hash header error: %v",err)
+//		}
+//		parentParentHash = header.ParentHash
+//	}else{
+//		parentParentHash = parentHash
+//	}
+//	storage, err := types.CreateStorageKey(c.Meta, "TransactionPayment", "NextFeeMultiplier", nil, nil)
+//	if err != nil {
+//		return "", fmt.Errorf("create storage key error: %v",err)
+//	}
+//	var multiplier types.U128
+//	var ok bool
+//	ok,err = c.C.RPC.State.GetStorage(storage, &multiplier, parentParentHash)
+//	if err != nil || !ok {
+//		return "", fmt.Errorf("get storage error: %v",err)
+//	}
+//	c.cf.SetMultiplier(multiplier.Int64())
+//	//get weight
+//	fee:=c.cf.CalcPartialFee(weight,len)
+//	return fmt.Sprintf("%d",fee),nil
+//}
+func (c *Client) getWeight(events *types.EventRecords, extrinsicIdx int) int64 {
+	if len(events.System_ExtrinsicFailed) > 0 {
+		for _, ef := range events.System_ExtrinsicFailed {
+			if int(ef.Phase.AsApplyExtrinsic) == extrinsicIdx {
+				return int64(ef.DispatchInfo.Weight)
+			}
+		}
+	}
+	if len(events.System_ExtrinsicSuccess) > 0 {
+		for _, es := range events.System_ExtrinsicSuccess {
+			if int(es.Phase.AsApplyExtrinsic) == extrinsicIdx {
+				return int64(es.DispatchInfo.Weight)
+			}
+		}
+	}
+	return 0
+}
+
+func (c *Client) GetPartialFee(extrinsic, parentHash string) (string, error) {
+	if !strings.HasPrefix(extrinsic, "0x") {
+		extrinsic = "0x" + extrinsic
+	}
+	var result map[string]interface{}
+	err := c.C.Client.Call(&result, "payment_queryInfo", extrinsic, parentHash)
+	if err != nil {
+		return "", fmt.Errorf("get payment info error: %v", err)
+	}
+	if result["partialFee"] == nil {
+		return "", errors.New("result partialFee is nil ptr")
+	}
+	fee, ok := result["partialFee"].(string)
+	if !ok {
+		return "", fmt.Errorf("partialFee is not string type: %v", result["partialFee"])
+	}
+	return fee, nil
 }

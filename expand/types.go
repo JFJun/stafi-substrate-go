@@ -84,6 +84,7 @@ func (b *Balance) Decode(decoder scale.Decoder) error {
 		b.Value = decimal.Zero
 		return nil
 	}
+
 	b.Value = decimal.NewFromBigInt(uint128.FromBytes(c).Big(), 0)
 	return nil
 }
@@ -226,4 +227,31 @@ type StafiAccountInfo struct {
 		MiscFrozen types.U128
 		FreeFrozen types.U128
 	}
+}
+
+type WeightToFeeCoefficient struct {
+	CoeffInteger types.U128
+	CoeffFrac    U32
+	Negative     bool
+	Degree       types.U8
+}
+
+func (d *WeightToFeeCoefficient) Decode(decoder scale.Decoder) error {
+	err := decoder.Decode(&d.CoeffInteger)
+	if err != nil {
+		return fmt.Errorf("decode WeightToFeeCoefficient: decode CoeffInteger error: %v", err)
+	}
+	err = decoder.Decode(&d.CoeffFrac)
+	if err != nil {
+		return fmt.Errorf("decode WeightToFeeCoefficient: decode CoeffFrac error: %v", err)
+	}
+	err = decoder.Decode(&d.Negative)
+	if err != nil {
+		return fmt.Errorf("decode WeightToFeeCoefficient: decode Negative error: %v", err)
+	}
+	err = decoder.Decode(&d.Degree)
+	if err != nil {
+		return fmt.Errorf("decode WeightToFeeCoefficient: decode Degree error: %v", err)
+	}
+	return nil
 }
