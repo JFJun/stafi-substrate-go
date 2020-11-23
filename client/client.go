@@ -244,6 +244,7 @@ func (c *Client) parseExtrinsicByDecode(extrinsics []string, blockResp *models.B
 		blockResp.Extrinsic = []*models.ExtrinsicResponse{}
 		return nil
 	}
+
 	blockResp.Extrinsic = make([]*models.ExtrinsicResponse, len(params))
 	for idx, param := range params {
 		e := new(models.ExtrinsicResponse)
@@ -274,7 +275,10 @@ func (c *Client) parseExtrinsicByStorage(blockHash string, blockResp *models.Blo
 			err = fmt.Errorf("panic decode event: %v", err1)
 		}
 	}()
-
+	if len(blockResp.Extrinsic) <= 0 {
+		//不包含交易就不处理了
+		return nil
+	}
 	storage, err = types.CreateStorageKey(c.Meta, "System", "Events", nil, nil)
 	if err != nil {
 		return fmt.Errorf("create storage key error: %v", err)
@@ -285,24 +289,29 @@ func (c *Client) parseExtrinsicByStorage(blockHash string, blockResp *models.Blo
 	if err != nil {
 		return fmt.Errorf("get storage data error: %v", err)
 	}
-	e := types.EventRecordsRaw(types.MustHexDecodeString(result.(string)))
-	var events types.EventRecords
-	err = e.DecodeEventRecords(c.Meta, &events)
+
+	ier, err := expand.DecodeEventRecords(c.Meta, result.(string), c.prefix)
 	if err != nil {
 		return fmt.Errorf("decode event data error: %v", err)
 	}
+	//e := types.EventRecordsRaw(types.MustHexDecodeString(result.(string)))
+	//var events types.EventRecords
+	//err = e.DecodeEventRecords(c.Meta, &events)
+	//if err != nil {
+	//	return fmt.Errorf("decode event data error: %v", err)
+	//}
 	var res []models.EventResult
 	failedMap := make(map[int]bool)
-	if len(events.Balances_Transfer) > 0 {
+	if len(ier.GetBalancesTransfer()) > 0 {
 		//有失败的交易
-		for _, failed := range events.System_ExtrinsicFailed {
+		for _, failed := range ier.GetSystemExtrinsicFailed() {
 			if failed.Phase.IsApplyExtrinsic {
 				extrinsicIdx := failed.Phase.AsApplyExtrinsic
 				//记录到失败的map中
 				failedMap[int(extrinsicIdx)] = true
 			}
 		}
-		for _, ebt := range events.Balances_Transfer {
+		for _, ebt := range ier.GetBalancesTransfer() {
 			if !ebt.Phase.IsApplyExtrinsic {
 				continue
 			}
@@ -322,7 +331,7 @@ func (c *Client) parseExtrinsicByStorage(blockHash string, blockResp *models.Blo
 				continue
 			}
 			r.Amount = decimal.NewFromInt(ebt.Value.Int64()).String()
-			r.Weight = c.getWeight(&events, r.ExtrinsicIdx)
+			//r.Weight = c.getWeight(&events, r.ExtrinsicIdx)
 			res = append(res, r)
 		}
 	}
@@ -354,23 +363,23 @@ func (c *Client) parseExtrinsicByStorage(blockHash string, blockResp *models.Blo
 	return nil
 }
 
-func (c *Client) calcFee(events *types.EventRecords, extrinsicIdx int) string {
-	var (
-		fee = decimal.Zero
-	)
-
-	for _, bd := range events.Balances_Deposit {
-		if bd.Phase.IsApplyExtrinsic && int(bd.Phase.AsApplyExtrinsic) == extrinsicIdx {
-			fee = fee.Add(decimal.NewFromInt(bd.Balance.Int64()))
-		}
-	}
-	for _, td := range events.Treasury_Deposit {
-		if td.Phase.IsApplyExtrinsic && int(td.Phase.AsApplyExtrinsic) == extrinsicIdx {
-			fee = fee.Add(decimal.NewFromInt(td.Deposited.Int64()))
-		}
-	}
-	return fee.String()
-}
+//func (c *Client) calcFee(events *types.EventRecords, extrinsicIdx int) string {
+//	var (
+//		fee = decimal.Zero
+//	)
+//
+//	for _, bd := range events.Balances_Deposit {
+//		if bd.Phase.IsApplyExtrinsic && int(bd.Phase.AsApplyExtrinsic) == extrinsicIdx {
+//			fee = fee.Add(decimal.NewFromInt(bd.Balance.Int64()))
+//		}
+//	}
+//	for _, td := range events.Treasury_Deposit {
+//		if td.Phase.IsApplyExtrinsic && int(td.Phase.AsApplyExtrinsic) == extrinsicIdx {
+//			fee = fee.Add(decimal.NewFromInt(td.Deposited.Int64()))
+//		}
+//	}
+//	return fee.String()
+//}
 
 func (c *Client) createTxHash(extrinsic string) string {
 	data, _ := hex.DecodeString(utils.RemoveHex0x(extrinsic))
@@ -453,23 +462,23 @@ func (c *Client) GetAccountInfo(address string) (*types.AccountInfo, error) {
 //	fee:=c.cf.CalcPartialFee(weight,len)
 //	return fmt.Sprintf("%d",fee),nil
 //}
-func (c *Client) getWeight(events *types.EventRecords, extrinsicIdx int) int64 {
-	if len(events.System_ExtrinsicFailed) > 0 {
-		for _, ef := range events.System_ExtrinsicFailed {
-			if int(ef.Phase.AsApplyExtrinsic) == extrinsicIdx {
-				return int64(ef.DispatchInfo.Weight)
-			}
-		}
-	}
-	if len(events.System_ExtrinsicSuccess) > 0 {
-		for _, es := range events.System_ExtrinsicSuccess {
-			if int(es.Phase.AsApplyExtrinsic) == extrinsicIdx {
-				return int64(es.DispatchInfo.Weight)
-			}
-		}
-	}
-	return 0
-}
+//func (c *Client) getWeight(events *types.EventRecords, extrinsicIdx int) int64 {
+//	if len(events.System_ExtrinsicFailed) > 0 {
+//		for _, ef := range events.System_ExtrinsicFailed {
+//			if int(ef.Phase.AsApplyExtrinsic) == extrinsicIdx {
+//				return int64(ef.DispatchInfo.Weight)
+//			}
+//		}
+//	}
+//	if len(events.System_ExtrinsicSuccess) > 0 {
+//		for _, es := range events.System_ExtrinsicSuccess {
+//			if int(es.Phase.AsApplyExtrinsic) == extrinsicIdx {
+//				return int64(es.DispatchInfo.Weight)
+//			}
+//		}
+//	}
+//	return 0
+//}
 
 func (c *Client) GetPartialFee(extrinsic, parentHash string) (string, error) {
 	if !strings.HasPrefix(extrinsic, "0x") {

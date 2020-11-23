@@ -25,7 +25,7 @@
     if err != nil {
     	t.Fatal(err)
     }
-    //2. 下面这句代码因为每个链的不同而不同，我看源代码是因为一个module的有无决定的
+    //2. 下面这句代码因为每个链的不同而不同，我看源代码是因为一个Indices这个module的有无决定的
     //  反正如果提交交易包含 MultiSignature错误什么的，就把 这个bool值设置为相反就行了
     types.SetSerDeOptions(types.SerDeOptions{NoPalletIndices: true})
     //3. 设置链的前缀
