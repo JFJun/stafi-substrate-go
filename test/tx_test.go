@@ -28,18 +28,25 @@ func Test_tx(t *testing.T) {
 	}
 	fmt.Println(v.TransactionVersion)
 	fmt.Println(v.SpecVersion)
-	//meta,err:=c.C.RPC.State.GetMetadataLatest()
-	//if err != nil {
-	//	t.Fatal(err)
-	//}
-	//types.SerDeOptionsFromMetadata(meta)
-
+	acc, err := c.GetAccountInfo(from)
+	if err != nil {
+		t.Fatal(err)
+	}
+	nonce = uint64(acc.Nonce)
 	types.SetSerDeOptions(types.SerDeOptions{NoPalletIndices: true})
 	transaction := tx.CreateTransaction(from, to, amount, nonce)
-	transaction.SetGenesisHashAndBlockHash("0x34f61bfda344b3fad3c3e38832a91448b3c613b199eb23e5110a635d71c13c65",
-		"0x34f61bfda344b3fad3c3e38832a91448b3c613b199eb23e5110a635d71c13c65")
-	transaction.SetSpecVersionAndCallId(uint32(v.SpecVersion), uint32(v.TransactionVersion), "1700")
-	tt, err := transaction.SignTransaction("000000", crypto.Sr25519Type)
+	transaction.SetGenesisHashAndBlockHash(c.GetGenesisHash(),
+		c.GetGenesisHash())
+	ed, err := expand.NewMetadataExpand(c.Meta)
+	if err != nil {
+		t.Fatal(err)
+	}
+	btCall, err := ed.MV.GetCallIndex("Balances", "transfer")
+	if err != nil {
+		t.Fatal(err)
+	}
+	transaction.SetSpecVersionAndCallId(uint32(v.SpecVersion), uint32(v.TransactionVersion), btCall)
+	tt, err := transaction.SignTransaction("", crypto.Sr25519Type)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -67,8 +74,11 @@ func Test_CreateUtilityBatch(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	fmt.Println(v.TransactionVersion)
-	fmt.Println(v.SpecVersion)
+	acc, err := c.GetAccountInfo(from)
+	if err != nil {
+		t.Fatal(err)
+	}
+	nonce = uint64(acc.Nonce)
 	pa := make(map[string]uint64)
 	pa[to] = 100
 	pa["5Hmy8BVAXAdaL6uxd41WJV4rhhWCNsXzekFRfuwLDkke9nG4"] = 1000000000
@@ -91,6 +101,51 @@ func Test_CreateUtilityBatch(t *testing.T) {
 	d, _ := json.Marshal(result)
 	fmt.Println(string(d))
 
+}
+
+func Test_TxWithMemo(t *testing.T) {
+	from := "5Fq9MpKxdjzCWEHHtqZ6rdYkKUtW4qwmJV4VHwKBan2hxRyL"
+	to := "5E2dFRZoSbXE4at8QjHPxfx8eWA9mvLFbH64ZE3wTAsEwVFu"
+	nonce := uint64(1)
+	amount := uint64(123456)
+	c, err := client.New("wss://testnet-1.chainx.org/ws")
+	if err != nil {
+		t.Fatal(err)
+	}
+	v, err := c.C.RPC.State.GetRuntimeVersionLatest()
+	if err != nil {
+		t.Fatal(err)
+	}
+	ed, err := expand.NewMetadataExpand(c.Meta)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ubCall, err := ed.MV.GetCallIndex("Utility", "batch")
+	if err != nil {
+		t.Fatal(err)
+	}
+	btCall, err := ed.MV.GetCallIndex("Balances", "transfer")
+	if err != nil {
+		t.Fatal(err)
+	}
+	srCall, err := ed.MV.GetCallIndex("System", "remark")
+	transaction := tx.CreateTransactionWithMemo(from, to, "test", amount, nonce, ubCall, srCall)
+	transaction.SetGenesisHashAndBlockHash(c.GetGenesisHash(),
+		c.GetGenesisHash())
+	transaction.SetSpecVersionAndCallId(uint32(v.SpecVersion), uint32(v.TransactionVersion), btCall)
+	tt, err := transaction.SignTransaction("", crypto.Sr25519Type)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println(tt)
+	var result interface{}
+	err = c.C.Client.Call(&result, "author_submitExtrinsic", tt)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println(result)
+	d, _ := json.Marshal(result)
+	fmt.Println(string(d))
 }
 
 func Test_FakeDeposit(t *testing.T) {

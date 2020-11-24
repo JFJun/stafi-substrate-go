@@ -1,9 +1,10 @@
 package expand
 
 import (
-	"github.com/JFJun/go-substrate-crypto/ss58"
 	"github.com/JFJun/stafi-substrate-go/expand/chainX"
+	"github.com/JFJun/stafi-substrate-go/expand/darwinia"
 	"github.com/stafiprotocol/go-substrate-rpc-client/types"
+	"strings"
 )
 
 type IEventRecords interface {
@@ -26,12 +27,19 @@ func (d *DefaultEventRecords) GetSystemExtrinsicFailed() []types.EventSystemExtr
 	return d.System_ExtrinsicFailed
 }
 
-func DecodeEventRecords(meta *types.Metadata, rawData string, prefix []byte) (IEventRecords, error) {
+func DecodeEventRecords(meta *types.Metadata, rawData string, chainName string) (IEventRecords, error) {
 	e := types.EventRecordsRaw(types.MustHexDecodeString(rawData))
 	var ier IEventRecords
-	switch string(prefix) {
-	case string(ss58.ChainXPrefix), string(ss58.SubstratePrefix):
+	switch strings.ToLower(chainName) {
+	case "chainx":
 		var events chainX.ChainXEventRecords
+		err := e.DecodeEventRecords(meta, &events)
+		if err != nil {
+			return nil, err
+		}
+		ier = &events
+	case "crab", "darwinia":
+		var events darwinia.DarwiniaEventRecords
 		err := e.DecodeEventRecords(meta, &events)
 		if err != nil {
 			return nil, err

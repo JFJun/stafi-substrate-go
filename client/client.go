@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/JFJun/go-substrate-crypto/ss58"
+	"github.com/JFJun/stafi-substrate-go/base"
 	"github.com/JFJun/stafi-substrate-go/expand"
 	"github.com/JFJun/stafi-substrate-go/models"
 	"github.com/JFJun/stafi-substrate-go/utils"
@@ -24,14 +25,20 @@ type Client struct {
 	C                  *gsrc.SubstrateAPI
 	Meta               *types.Metadata
 	prefix             []byte //币种的前缀
+	ChainName          string //链名字
 	SpecVersion        int
 	TransactionVersion int
 	genesisHash        string
+	BasicType          *base.BasicTypes
 }
 
 func New(url string) (*Client, error) {
 	c := new(Client)
 	var err error
+	c.BasicType, err = base.InitBasicTypes("../base/ss58-registry.json")
+	if err != nil {
+		return nil, fmt.Errorf("init base type error: %v", err)
+	}
 	c.C, err = gsrc.NewSubstrateAPI(url)
 	if err != nil {
 		return nil, err
@@ -40,7 +47,12 @@ func New(url string) (*Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	c.prefix = ss58.SubstratePrefix //默认prefix
+	/*
+		设置prefix
+	*/
+	if len(c.prefix) == 0 {
+		c.prefix, _ = c.BasicType.GetChainPrefix(c.ChainName)
+	}
 	return c, nil
 }
 
@@ -49,8 +61,9 @@ func (c *Client) checkRuntimeVersion() error {
 	if err != nil {
 		return fmt.Errorf("init runtime version error,err=%v", err)
 	}
-	c.TransactionVersion = int(uint32(v.TransactionVersion))
-	specVersion := int(uint32(v.SpecVersion))
+	c.TransactionVersion = int(v.TransactionVersion)
+	c.ChainName = v.SpecName
+	specVersion := int(v.SpecVersion)
 	if specVersion != c.SpecVersion {
 		c.Meta, err = c.C.RPC.State.GetMetadataLatest()
 		if err != nil {
@@ -73,6 +86,9 @@ func (c *Client) GetGenesisHash() string {
 	return hash.Hex()
 }
 
+/*
+自定义设置prefix，如果启动时加载的prefix是错误的，则需要手动配置prefix
+*/
 func (c *Client) SetPrefix(prefix []byte) {
 	c.prefix = prefix
 }
@@ -289,8 +305,7 @@ func (c *Client) parseExtrinsicByStorage(blockHash string, blockResp *models.Blo
 	if err != nil {
 		return fmt.Errorf("get storage data error: %v", err)
 	}
-
-	ier, err := expand.DecodeEventRecords(c.Meta, result.(string), c.prefix)
+	ier, err := expand.DecodeEventRecords(c.Meta, result.(string), c.ChainName)
 	if err != nil {
 		return fmt.Errorf("decode event data error: %v", err)
 	}
@@ -388,7 +403,6 @@ func (c *Client) createTxHash(extrinsic string) string {
 }
 
 func (c *Client) GetAccountInfo(address string) (*types.AccountInfo, error) {
-
 	var (
 		storage types.StorageKey
 		err     error

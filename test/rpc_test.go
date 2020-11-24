@@ -108,13 +108,13 @@ func Test_GetAccountInfo(t *testing.T) {
 }
 
 func Test_GetBlockByNumber(t *testing.T) {
-	c, err := client.New("wss://rpc.polkadot.io")
+	c, err := client.New("")
 	if err != nil {
 		t.Fatal(err)
 	}
 	//types.SetSerDeOptions(types.SerDeOptions{NoPalletIndices: true})
-	c.SetPrefix(ss58.StafiPrefix)
-	resp, err := c.GetBlockByNumber(2517230)
+
+	resp, err := c.GetBlockByNumber(2802459)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -123,7 +123,7 @@ func Test_GetBlockByNumber(t *testing.T) {
 }
 
 func Test_GetGenesisHash(t *testing.T) {
-	c, err := client.New("wss://mainnet-rpc.stafi.io")
+	c, err := client.New("wss://testnet-1.chainx.org/ws")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -208,6 +208,18 @@ func Test_CalcFee(t *testing.T) {
 	cf := expand.NewCalcFee(hj, extrinsicBaseWeight, int64(transactionByteFee), int64(weight.Int64()))
 	fee := cf.CalcPartialFee(190949000, 143)
 	fmt.Println(fee)
+}
+
+func Test_GetChainName(t *testing.T) {
+	c, err := client.New("wss://cc1.darwinia.network")
+	if err != nil {
+		t.Fatal(err)
+	}
+	d, err := c.C.RPC.State.GetRuntimeVersionLatest()
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println(d.SpecName)
 }
 
 // 1700dcea9317bceb28b52bdae9229a3794de4ca85e36d990a78f779c6fd7f27eb54102890700003c001c0000000300000034f61bfda344b3fad3c3e38832a91448b3c613b199eb23e5110a635d71c13c6534f61bfda344b3fad3c3e38832a91448b3c613b199eb23e5110a635d71c13c65

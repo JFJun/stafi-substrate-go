@@ -14,21 +14,22 @@ import (
 )
 
 func Test_Chain_GetBlockByNumber(t *testing.T) {
-	c, err := client.New("wss://testnet-1.chainx.org/ws")
+	c, err := client.New("wss://rpc.kulupu.corepaper.org/ws")
 	if err != nil {
 		t.Fatal(err)
 	}
-	//dd,_:=json.Marshal(c.Meta.AsMetadataV12.Modules)
-	//fmt.Println(string(dd))
-	//for _,mod:=range c.Meta.AsMetadataV12.Modules{
-	//	if mod.HasEvents {
-	//		for _,event:=range mod.Events{
-	//			fmt.Printf("%s_%s\n",mod.Name,event.Name)
-	//			fmt.Println(event.Args)
-	//			fmt.Println("------------------------------------------------")
-	//		}
-	//	}
-	//}
+	dd, _ := json.Marshal(c.Meta.AsMetadataV12.Modules)
+	fmt.Println(string(dd))
+	fmt.Println(c.ChainName)
+	for _, mod := range c.Meta.AsMetadataV12.Modules {
+		if mod.HasEvents {
+			for _, event := range mod.Events {
+				fmt.Printf("%s_%s\n", mod.Name, event.Name)
+				fmt.Println(event.Args)
+				fmt.Println("------------------------------------------------")
+			}
+		}
+	}
 	c.SetPrefix(ss58.SubstratePrefix)
 	block, err := c.GetBlockByNumber(60165)
 	if err != nil {
@@ -120,4 +121,16 @@ func Test_CreateAddress(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Println(address)
+}
+
+func Test_GetChainXAccountInfo(t *testing.T) {
+	c, err := client.New("wss://testnet-1.chainx.org/ws")
+	if err != nil {
+		t.Fatal(err)
+	}
+	acc, err := c.GetAccountInfo("5Fq9MpKxdjzCWEHHtqZ6rdYkKUtW4qwmJV4VHwKBan2hxRyL")
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println(acc.Nonce)
 }
