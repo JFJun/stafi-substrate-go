@@ -1,6 +1,8 @@
 #   stafi go sdk
 ## 介绍
-    1. 该包不仅可用于stafi的区块解析以及离线签名，还可以用于polkadot以及substrate其他的链，目前暂不支持dawinia链
+    1. 该包不仅可用于波卡系列的区块解析以及离线签名。
+        目前该包支持以下币种：
+            stafi(FIS),polkadot(DOT),kusama(KSM),chainX2.0(PCX),darwinia(CRING,RING)
     2. 这个包其实是对github.com/JFJun/substrate-go包的升级，所以功能与两者相似，只不过这个包更简洁更稳定。
 ## 使用
 ### 1. 解析区块
@@ -31,6 +33,11 @@
     //3. 设置链的前缀
     c.SetPrefix(ss58.StafiPrefix)
     //4。 创建交易
+    acc,err := c.GetAccountInfo(from)
+    if err != nil {
+        t.Fatal(err)
+    }
+    nonce := uint64(acc.Nonce)
     transaction:=tx.CreateTransaction(from,to,amount,nonce)
     //5. 设置交易签名需要的参数
     callIdx,err:=ed.MV.GetCallIndex("Balances","transfer")
@@ -70,9 +77,14 @@
         ...
     }
     uitlityCallIdx,err:=ed.MV.GetCallIndex("Utility","batch")
-        if err != nil {
-            t.Fatal(err)
-        }
+   if err != nil {
+       t.Fatal(err)
+   }
+    acc,err := c.GetAccountInfo(from)
+    if err != nil {
+        t.Fatal(err)
+    }
+    nonce := uint64(acc.Nonce)
     transaction:=tx.CreateUtilityBatchTransaction(from,nonce,pa,uitlityCallIdx)
     
     其他的步骤和Balances.transfer是一样的
