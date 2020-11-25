@@ -14,22 +14,23 @@ import (
 )
 
 func Test_Chain_GetBlockByNumber(t *testing.T) {
-	c, err := client.New("wss://rpc.kulupu.corepaper.org/ws")
+	c, err := client.New("wss://node.v1.riochain.io/ws")
 	if err != nil {
 		t.Fatal(err)
 	}
 	dd, _ := json.Marshal(c.Meta.AsMetadataV12.Modules)
 	fmt.Println(string(dd))
 	fmt.Println(c.ChainName)
-	for _, mod := range c.Meta.AsMetadataV12.Modules {
-		if mod.HasEvents {
-			for _, event := range mod.Events {
-				fmt.Printf("%s_%s\n", mod.Name, event.Name)
-				fmt.Println(event.Args)
-				fmt.Println("------------------------------------------------")
-			}
-		}
-	}
+	//for _, mod := range c.Meta.AsMetadataV12.Modules {
+	//	if mod.HasEvents {
+	//		for _, event := range mod.Events {
+	//			fmt.Printf("%s_%s\n", mod.Name, event.Name)
+	//			fmt.Printf("type Event%s%s struct { \n	Phase    types.Phase\n	%v\n	Topics []Hash\n}\n",mod.Name,event.Name,event.Args)
+	//			//fmt.Println(event.Args)
+	//			fmt.Println("------------------------------------------------")
+	//		}
+	//	}
+	//}
 	c.SetPrefix(ss58.SubstratePrefix)
 	block, err := c.GetBlockByNumber(60165)
 	if err != nil {
@@ -115,12 +116,13 @@ func Test_GetChainXBlock(t *testing.T) {
 func Test_CreateAddress(t *testing.T) {
 	pub := "a69958eee5de0cb8fb250eba9c4b4ab1675468e68e49a5ebcac22fa9340fe938"
 	pubBytes, _ := hex.DecodeString(pub)
-	pubBytes = append([]byte{0xff}, pubBytes...)
+	//pubBytes = append([]byte{0xff}, pubBytes...)
 	address, err := ss58.Encode(pubBytes, ss58.SubstratePrefix)
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Println(address)
+	//fmt.Println(base58.Decode("5UwyMPdTkRN2Va6DYWMJY3TYVcxgqgsUEN9Fsey8LR7hsgUn"))
 }
 
 func Test_GetChainXAccountInfo(t *testing.T) {

@@ -1,6 +1,7 @@
 package expand
 
 import (
+	"github.com/JFJun/stafi-substrate-go/expand/base"
 	"github.com/JFJun/stafi-substrate-go/expand/chainX"
 	"github.com/JFJun/stafi-substrate-go/expand/darwinia"
 	"github.com/stafiprotocol/go-substrate-rpc-client/types"
@@ -11,20 +12,6 @@ type IEventRecords interface {
 	GetBalancesTransfer() []types.EventBalancesTransfer
 	GetSystemExtrinsicSuccess() []types.EventSystemExtrinsicSuccess
 	GetSystemExtrinsicFailed() []types.EventSystemExtrinsicFailed
-}
-
-type DefaultEventRecords struct {
-	types.EventRecords
-}
-
-func (d *DefaultEventRecords) GetBalancesTransfer() []types.EventBalancesTransfer {
-	return d.Balances_Transfer
-}
-func (d *DefaultEventRecords) GetSystemExtrinsicSuccess() []types.EventSystemExtrinsicSuccess {
-	return d.System_ExtrinsicSuccess
-}
-func (d *DefaultEventRecords) GetSystemExtrinsicFailed() []types.EventSystemExtrinsicFailed {
-	return d.System_ExtrinsicFailed
 }
 
 func DecodeEventRecords(meta *types.Metadata, rawData string, chainName string) (IEventRecords, error) {
@@ -46,7 +33,7 @@ func DecodeEventRecords(meta *types.Metadata, rawData string, chainName string) 
 		}
 		ier = &events
 	default:
-		var events DefaultEventRecords
+		var events base.BaseEventRecords
 		err := e.DecodeEventRecords(meta, &events)
 		if err != nil {
 			return nil, err
