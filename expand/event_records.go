@@ -1,8 +1,10 @@
 package expand
 
 import (
+	"github.com/JFJun/stafi-substrate-go/expand/acala"
 	"github.com/JFJun/stafi-substrate-go/expand/base"
 	"github.com/JFJun/stafi-substrate-go/expand/chainX"
+	"github.com/JFJun/stafi-substrate-go/expand/crust"
 	"github.com/JFJun/stafi-substrate-go/expand/darwinia"
 	"github.com/stafiprotocol/go-substrate-rpc-client/types"
 	"strings"
@@ -27,6 +29,20 @@ func DecodeEventRecords(meta *types.Metadata, rawData string, chainName string) 
 		ier = &events
 	case "crab", "darwinia":
 		var events darwinia.DarwiniaEventRecords
+		err := e.DecodeEventRecords(meta, &events)
+		if err != nil {
+			return nil, err
+		}
+		ier = &events
+	case "crust":
+		var events crust.CRustEventRecords
+		err := e.DecodeEventRecords(meta, &events)
+		if err != nil {
+			return nil, err
+		}
+		ier = &events
+	case "mandala": // acala mandala 网络
+		var events acala.AcalaEventRecords
 		err := e.DecodeEventRecords(meta, &events)
 		if err != nil {
 			return nil, err

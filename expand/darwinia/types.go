@@ -1,8 +1,7 @@
 package darwinia
 
 import (
-	"encoding/hex"
-	"fmt"
+	"github.com/JFJun/stafi-substrate-go/expand/base"
 	"github.com/stafiprotocol/go-substrate-rpc-client/scale"
 	"github.com/stafiprotocol/go-substrate-rpc-client/types"
 )
@@ -215,7 +214,7 @@ type EventElectionsPhragmenVoterReported struct {
 type EventClaimsClaimed struct {
 	Phase       types.Phase
 	Who         types.AccountID
-	AddressT    VecU8L20 //[u8;20]
+	AddressT    base.VecU8L20 //[u8;20]
 	RingBalance types.U128
 	Topics      []types.Hash
 }
@@ -430,37 +429,9 @@ type AccountBalance struct {
 	Balance types.U128
 }
 
-type VecU8L20 struct {
-	Value string
-}
-
-func (d *VecU8L20) Decode(decoder scale.Decoder) error {
-	data := make([]byte, 20)
-	err := decoder.Read(data)
-	if err != nil {
-		return fmt.Errorf("U8L20 read bytes error: %v", err)
-	}
-	d.Value = hex.EncodeToString(data)
-	return nil
-}
-
-type VecU8L256 struct {
-	Value string
-}
-
-func (d *VecU8L256) Decode(decoder scale.Decoder) error {
-	data := make([]byte, 256)
-	err := decoder.Read(data)
-	if err != nil {
-		return fmt.Errorf("U8L256 read bytes error: %v", err)
-	}
-	d.Value = hex.EncodeToString(data)
-	return nil
-}
-
 type EthereumReceipt struct {
 	GasUsed  types.U256
-	LogBloom VecU8L256
+	LogBloom base.VecU8L256
 	Logs     []types.Null
 	Outcome  types.Null
 }

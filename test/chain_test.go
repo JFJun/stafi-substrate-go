@@ -179,6 +179,18 @@ var existTypes = []string{
 	"Treasury_BountyCanceled",
 	"Treasury_BountyExtended",
 	"TechnicalMembership_Dummy",
+	"Currencies_Transferred",
+	"Currencies_BalanceUpdated",
+	"Currencies_Deposited",
+	"Currencies_Withdrawn",
+	"Vesting_VestingScheduleAdded",
+	"Vesting_Claimed",
+	"Vesting_VestingSchedulesUpdated",
+	"Multisig_NewMultisig",
+	"Multisig_MultisigApproval",
+	"Multisig_MultisigExecuted",
+	"Multisig_MultisigCancelled",
+	"Balances_ReserveRepatriated",
 }
 
 func IsExist(typeName string) bool {

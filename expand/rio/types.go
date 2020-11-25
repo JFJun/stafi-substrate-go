@@ -1,21 +1,17 @@
 package rio
 
-// todo 目前还无法对接这个币，许多的types官方包里面都没有说明
-
+//
+//import (
+//	"fmt"
+//	"github.com/JFJun/stafi-substrate-go/expand/base"
+//	"github.com/stafiprotocol/go-substrate-rpc-client/scale"
+//	"github.com/stafiprotocol/go-substrate-rpc-client/types"
+//)
+//
+////todo 目前还无法对接这个币，许多的types官方包里面都没有说明
+//
 //type RioEventRecords struct {
 //	base.BaseEventRecords
-//	Balances_ReserveRepatriated		[]EventBalancesReserveRepatriated
-//	Multisig_NewMultisig			[]types.EventMultisigNewMultisig
-//	Multisig_MultisigApproval		[]types.EventMultisigApproval
-//	Multisig_MultisigExecuted		[]types.EventMultisigExecuted
-//	Multisig_MultisigCancelled		[]types.EventMultisigCancelled
-//	Currencies_Transferred                      []EventCurrenciesTransferred
-//	Currencies_BalanceUpdated                   []EventCurrenciesBalanceUpdated
-//	Currencies_Deposited                        []EventCurrenciesDeposited
-//	Currencies_Withdrawn                        []EventCurrenciesWithdrawn
-//	Vesting_VestingScheduleAdded				[]EventVestingVestingScheduleAdded
-//	Vesting_Claimed								[]EventVestingClaimed
-//	Vesting_VestingSchedulesUpdated		[]EventVestingVestingSchedulesUpdated
 //	Oracle_NewFeedData		[]EventOracleNewFeedData
 //	RioAssets_Transferred		[]EventRioAssetsTransferred
 //	RioAssets_Created		[]EventRioAssetsCreated
@@ -43,69 +39,10 @@ package rio
 //	RioRoot_LockedRFuelIssued		[]EventRioRootLockedRFuelIssued
 //}
 //
-//type EventBalancesReserveRepatriated struct {
-//	Phase    types.Phase
-//	From 	 types.AccountID
-//	To 		types.AccountID
-//	Balance	types.U128
-//	Status	types.BalanceStatus
-//	Topics []types.Hash
-//}
 //
 //
-//type EventCurrenciesTransferred struct {
-//	Phase      types.Phase
-//	CurrencyId CurrencyId
-//	AccountId1 types.AccountID
-//	AccountId2 types.AccountID
-//	Balance    types.U128
-//	Topics     []types.Hash
-//}
 //
-//type EventCurrenciesBalanceUpdated struct {
-//	Phase      types.Phase
-//	CurrencyId CurrencyId
-//	AccountId  types.AccountID
-//	Balance    types.U128
-//	Topics     []types.Hash
-//}
 //
-//type EventCurrenciesDeposited struct {
-//	Phase      types.Phase
-//	CurrencyId CurrencyId
-//	AccountId  types.AccountID
-//	Balance    types.U128
-//	Topics     []types.Hash
-//}
-//
-//type EventCurrenciesWithdrawn struct {
-//	Phase      types.Phase
-//	CurrencyId CurrencyId
-//	AccountId  types.AccountID
-//	Balance    types.U128
-//	Topics     []types.Hash
-//}
-//
-//type EventVestingVestingScheduleAdded struct {
-//	Phase    types.Phase
-//	From 		types.AccountID
-//	To 			types.AccountID
-//	VestingSchedule 	VestingSchedule
-//	Topics []types.Hash
-//}
-//
-//type EventVestingClaimed struct {
-//	Phase    types.Phase
-//	Who 		types.AccountID
-//	Balance 	types.U128
-//	Topics []types.Hash
-//}
-//
-//type EventVestingVestingSchedulesUpdated struct {
-//	Phase    types.Phase
-//	Who 		types.AccountID
-//	Topics []types.Hash
-//}
 //type EventOracleNewFeedData struct {
 //	Phase    types.Phase
 //	Who 		types.AccountID
@@ -117,7 +54,7 @@ package rio
 //}
 //type EventRioAssetsTransferred struct {
 //	Phase    types.Phase
-//	CurrencyId	CurrencyId
+//	CurrencyId	base.CurrencyId
 //	From 		types.AccountID
 //	To 			types.AccountID
 //	Balance		types.U128
@@ -126,19 +63,19 @@ package rio
 //
 //type EventRioAssetsCreated struct {
 //	Phase    types.Phase
-//	CurrencyId	CurrencyId
+//	CurrencyId	base.CurrencyId
 //	Topics []types.Hash
 //}
 //
 //type EventRioAssetsUpdateAssetRestriction struct {
 //	Phase    types.Phase
-//	CurrencyId	CurrencyId
+//	CurrencyId	base.CurrencyId
 //	Restrictions	Restrictions
 //	Topics []types.Hash
 //}
 //type EventRioAssetsRevoke struct {
 //	Phase    types.Phase
-//	CurrencyId	CurrencyId
+//	CurrencyId	base.CurrencyId
 //	Topics []types.Hash
 //}
 //
@@ -169,28 +106,28 @@ package rio
 //type EventRioGatewaySupportedAssetAdded struct {
 //	Phase    types.Phase
 //	Who 		types.AccountID
-//	CurrencyId	CurrencyId
+//	CurrencyId	base.CurrencyId
 //	Balance 	types.U128
 //	Topics []types.Hash
 //}
 //type EventRioGatewaySupportedAssetRemoved struct {
 //	Phase    types.Phase
 //	Who 	types.AccountID
-//	CurrencyId	CurrencyId
+//	CurrencyId	base.CurrencyId
 //	Topics []types.Hash
 //}
 //
 //type EventRioGatewayWithdrawaFeeSetted struct {
 //	Phase    types.Phase
 //	Who 	types.AccountID
-//	CurrencyId	CurrencyId
+//	CurrencyId	base.CurrencyId
 //	Balance	types.U128
 //	Topics []types.Hash
 //}
 //
 //type EventRioGatewayNewDepositAddrInfoOfAssetId struct {
 //	Phase    types.Phase
-//	CurrencyId	CurrencyId
+//	CurrencyId	base.CurrencyId
 //	DepositAddrInfo	DepositAddrInfo
 //	Topics []types.Hash
 //}
@@ -208,7 +145,7 @@ package rio
 //
 //type EventRioGatewayNewDepositRecord struct {
 //	Phase    types.Phase
-//	CurrencyId	CurrencyId
+//	CurrencyId	base.CurrencyId
 //	Who 		types.AccountID
 //	Balance		types.U128
 //	TxHash 		TxHash
@@ -217,7 +154,7 @@ package rio
 //type EventRioGatewayNewPendingWithdrawRecord struct {
 //	Phase    types.Phase
 //	U64 	types.U64
-//	CurrencyId	CurrencyId
+//	CurrencyId	base.CurrencyId
 //	Who	 		types.AccountID
 //	Balance 	types.Bytes128
 //	Topics []types.Hash
@@ -255,14 +192,14 @@ package rio
 //
 //type EventRioPricesLockPrice struct {
 //	Phase    types.Phase
-//	CurrencyId	CurrencyId
+//	CurrencyId	base.CurrencyId
 //	Price	Price
 //	Topics []types.Hash
 //}
 //
 //type EventRioPricesUnlockPrice struct {
 //	Phase    types.Phase
-//	CurrencyId	CurrencyId
+//	CurrencyId	base.CurrencyId
 //	Topics []types.Hash
 //}
 //
@@ -279,29 +216,7 @@ package rio
 //	Topics []types.Hash
 //}
 ////---------------------------------
-//type CurrencyId types.U32
 //
-///*
-//https://github.com/polkadot-js/api/blob/95c4f03bc3709c58b159623ec5c3c9794e077d08/packages/types/src/interfaces/balances/definitions.ts
-//*/
-//type VestingSchedule struct {
-//	Offset 	types.U128
-//	PerBlock	types.U128
-//	StartingBlock	types.BlockNumber
-//}
-//
-//func (d *VestingSchedule)Decode(decoder scale.Decoder)error{
-//	err:=decoder.Decode(&d.Offset)
-//	if err != nil {
-//		return err
-//	}
-//	err = decoder.Decode(&d.PerBlock)
-//	if err != nil {
-//		return err
-//	}
-//
-//	return decoder.Decode(&d.StartingBlock)
-//}
 //
 ///*
 //https://github.com/RioDefi/riochain
