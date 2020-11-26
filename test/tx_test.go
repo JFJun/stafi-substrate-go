@@ -16,9 +16,9 @@ func Test_tx(t *testing.T) {
 
 	from := "5DkswVFmWPUwPkmqMUEvavvso2HMdiyY71ixA2e52Ynwzvtg"
 	to := "5H4N5JZHuqkprDKSR9SJeTMivbQQ94WrxeFELxh45ACoZFQC"
-	nonce := uint64(15)
-	amount := uint64(123456)
-	c, err := client.New("wss://crab.darwinia.network")
+
+	amount := uint64(1234567890000)
+	c, err := client.New("wss://node-6714447553211260928.rz.onfinality.io/ws")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -32,8 +32,8 @@ func Test_tx(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	nonce = uint64(acc.Nonce)
-	types.SetSerDeOptions(types.SerDeOptions{NoPalletIndices: true})
+	nonce := uint64(acc.Nonce)
+	//types.SetSerDeOptions(types.SerDeOptions{NoPalletIndices: true})
 	transaction := tx.CreateTransaction(from, to, amount, nonce)
 	transaction.SetGenesisHashAndBlockHash(c.GetGenesisHash(),
 		c.GetGenesisHash())
@@ -57,8 +57,6 @@ func Test_tx(t *testing.T) {
 		t.Fatal(err)
 	}
 	fmt.Println(result)
-	d, _ := json.Marshal(result)
-	fmt.Println(string(d))
 }
 
 func Test_CreateUtilityBatch(t *testing.T) {
@@ -66,7 +64,7 @@ func Test_CreateUtilityBatch(t *testing.T) {
 	to := "5H4N5JZHuqkprDKSR9SJeTMivbQQ94WrxeFELxh45ACoZFQC"
 	nonce := uint64(16)
 	//amount := uint64(123456)
-	c, err := client.New("wss://crab.darwinia.network")
+	c, err := client.New("wss://api.crust.network/")
 	if err != nil {
 		t.Fatal(err)
 	}

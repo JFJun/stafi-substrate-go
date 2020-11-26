@@ -35,7 +35,7 @@ type Client struct {
 func New(url string) (*Client, error) {
 	c := new(Client)
 	var err error
-	c.BasicType, err = base.InitBasicTypes("../base/ss58-registry.json")
+	c.BasicType, err = base.InitBasicTypesByHexData()
 	if err != nil {
 		return nil, fmt.Errorf("init base type error: %v", err)
 	}

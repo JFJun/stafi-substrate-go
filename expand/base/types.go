@@ -33,6 +33,7 @@ type BaseEventRecords struct {
 	Multisig_MultisigCancelled []types.EventMultisigCancelled
 
 	Balances_ReserveRepatriated []EventBalancesReserveRepatriated
+	Proxy_Announced             []EventProxyAnnounced
 }
 
 func (d *BaseEventRecords) GetBalancesTransfer() []types.EventBalancesTransfer {
@@ -157,6 +158,13 @@ type EventBalancesReserveRepatriated struct {
 	Balance types.U128
 	Status  types.BalanceStatus
 	Topics  []types.Hash
+}
+type EventProxyAnnounced struct {
+	Phase  types.Phase
+	Who    types.AccountID
+	ID     types.AccountID
+	Hash   types.Hash
+	Topics []types.Hash
 }
 
 type CurrencyId types.U32

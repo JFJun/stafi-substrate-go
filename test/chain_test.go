@@ -191,6 +191,7 @@ var existTypes = []string{
 	"Multisig_MultisigExecuted",
 	"Multisig_MultisigCancelled",
 	"Balances_ReserveRepatriated",
+	"Proxy_Announced",
 }
 
 func IsExist(typeName string) bool {
