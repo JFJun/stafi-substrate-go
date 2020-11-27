@@ -78,7 +78,7 @@ func (c *Client) reConnectWs() (*gsrc.SubstrateAPI, error) {
 func (c *Client) checkRuntimeVersion() error {
 	v, err := c.C.RPC.State.GetRuntimeVersionLatest()
 	if err != nil {
-		if !strings.HasPrefix(err.Error(), "tls: use of closed connection") {
+		if !strings.Contains(err.Error(), "tls: use of closed connection") {
 			return fmt.Errorf("init runtime version error,err=%v", err)
 		}
 		//	重连处理，这是因为第三方包的问题，所以只能这样处理了了
