@@ -45,7 +45,9 @@
         t.Fatal(err)
     }
     transaction.SetGenesisHashAndBlockHash(c.GetGenesisHash(),c.GetGenesisHash())
-    transaction.SetSpecVersionAndCallId(uint32(c.SpecVersion),uint32(c.TransactionVersion),callIdx)
+    .SetSpecVersionAndCallId(uint32(c.SpecVersion),uint32(c.TransactionVersion),callIdx)
+    .SetTip(0)          //自行选择设置，可增加给矿工的手续费
+    .SetEra(0,0)        //自行选择设置，设置交易如果处于pending状态，最多能存活多少个块
     //6. 签名交易
     tt,err:=transaction.SignTransaction("私钥",crypto.Sr25519Type)
     if err != nil {

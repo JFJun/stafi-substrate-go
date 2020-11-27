@@ -17,13 +17,14 @@ type Transaction struct {
 	RecipientPubkey    string            `json:"recipient_pubkey"` // to address public key ,0x开头
 	Amount             uint64            `json:"amount"`           // 转账金额
 	Nonce              uint64            `json:"nonce"`            //nonce值
-	Fee                uint64            `json:"fee"`              //手续费
-	BlockHeight        uint64            `json:"block_height"`     //最新区块高度
+	Tip                uint64            `json:"tip"`              //小费
+	BlockNumber        uint64            `json:"block_Number"`     //最新区块高度
+	EraPeriod          uint64            `json:"era_period"`       // 存活最大区块
 	BlockHash          string            `json:"block_hash"`       //最新区块hash
 	GenesisHash        string            `json:"genesis_hash"`     //
 	SpecVersion        uint32            `json:"spec_version"`
 	TransactionVersion uint32            `json:"transaction_version"`
-	CallId             string            `json:"call_id"` //
+	CallId             string            `json:"call_id"` // Balances.transfer的call index
 	UtilityBatchCallId string            `json:"utility_batch_call_id"`
 	PubkeyAmount       map[string]uint64 `json:"pubkey_amount"` //用于utilityBatch
 	//  用于交易memo
@@ -65,16 +66,39 @@ func CreateTransactionWithMemo(from, to, memo string, amount, nonce uint64, util
 	}
 }
 
-func (tx *Transaction) SetGenesisHashAndBlockHash(genesisHash, blockHash string) {
+func (tx *Transaction) SetGenesisHashAndBlockHash(genesisHash, blockHash string) *Transaction {
 	tx.GenesisHash = utils.Remove0X(genesisHash)
 	tx.BlockHash = utils.Remove0X(blockHash)
+	return tx
 }
 
-func (tx *Transaction) SetSpecVersionAndCallId(specVersion, transactionVersion uint32, callIdx string) {
+func (tx *Transaction) SetSpecVersionAndCallId(specVersion, transactionVersion uint32, callIdx string) *Transaction {
 	tx.SpecVersion = specVersion
 	tx.TransactionVersion = transactionVersion
 	tx.CallId = callIdx
+	return tx
 }
+
+/*
+给矿工增加手续费，可以加快打包速度
+*/
+func (tx *Transaction) SetTip(tip uint64) *Transaction {
+	tx.Tip = tip
+	return tx
+}
+
+/*
+设置如果交易一直处于pending中，最多存活多少个块
+*/
+func (tx *Transaction) SetEra(blockNumber, eraPeriod uint64) *Transaction {
+	tx.BlockNumber = blockNumber
+	tx.EraPeriod = eraPeriod
+	return tx
+}
+
+/*
+检查是否有必要的参数
+*/
 func (tx *Transaction) checkTxParams() error {
 	if tx.SenderPubkey == "" {
 		return errors.New("send public key is null")
@@ -156,13 +180,16 @@ func (tx *Transaction) SignTransaction(privateKey string, signType int) (string,
 	}
 	ext := types.NewExtrinsic(call)
 	o := types.SignatureOptions{
-		BlockHash: types.NewHash(types.MustHexDecodeString(tx.BlockHash)),
-		// Era: ExtrinsicEra{IsImmortalEra: true},
+		BlockHash:          types.NewHash(types.MustHexDecodeString(tx.BlockHash)),
 		GenesisHash:        types.NewHash(types.MustHexDecodeString(tx.GenesisHash)),
 		Nonce:              types.NewUCompactFromUInt(tx.Nonce),
-		SpecVersion:        types.NewU32(uint32(tx.SpecVersion)),
-		Tip:                types.NewUCompactFromUInt(0),
-		TransactionVersion: types.NewU32(uint32(tx.TransactionVersion)),
+		SpecVersion:        types.NewU32(tx.SpecVersion),
+		Tip:                types.NewUCompactFromUInt(tx.Tip),
+		TransactionVersion: types.NewU32(tx.TransactionVersion),
+	}
+	era := tx.getEra()
+	if era != nil {
+		o.Era = *era
 	}
 	e := &ext
 	//签名
@@ -239,4 +266,33 @@ func (tx *Transaction) signTx(e *types.Extrinsic, o types.SignatureOptions, priv
 	e.Signature = extSig
 	e.Version |= types.ExtrinsicBitSigned
 	return nil
+}
+func (tx *Transaction) getEra() *types.ExtrinsicEra {
+	if tx.BlockNumber == 0 || tx.EraPeriod == 0 {
+		return nil
+	}
+	phase := tx.BlockNumber % tx.EraPeriod
+	index := uint64(6)
+	trailingZero := index - 1
+
+	var encoded uint64
+	if trailingZero > 1 {
+		encoded = trailingZero
+	} else {
+		encoded = 1
+	}
+
+	if trailingZero < 15 {
+		encoded = trailingZero
+	} else {
+		encoded = 15
+	}
+	encoded += phase / 1 << 4
+	first := byte(encoded >> 8)
+	second := byte(encoded & 0xff)
+	era := new(types.ExtrinsicEra)
+	era.IsMortalEra = true
+	era.AsMortalEra.First = first
+	era.AsMortalEra.Second = second
+	return era
 }

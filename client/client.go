@@ -13,6 +13,8 @@ import (
 	"github.com/JFJun/stafi-substrate-go/utils"
 	"github.com/shopspring/decimal"
 	gsrc "github.com/stafiprotocol/go-substrate-rpc-client"
+	gsClient "github.com/stafiprotocol/go-substrate-rpc-client/client"
+	"github.com/stafiprotocol/go-substrate-rpc-client/rpc"
 	"github.com/stafiprotocol/go-substrate-rpc-client/scale"
 	"github.com/stafiprotocol/go-substrate-rpc-client/types"
 	"golang.org/x/crypto/blake2b"
@@ -30,10 +32,12 @@ type Client struct {
 	TransactionVersion int
 	genesisHash        string
 	BasicType          *base.BasicTypes
+	url                string
 }
 
 func New(url string) (*Client, error) {
 	c := new(Client)
+	c.url = url
 	var err error
 	c.BasicType, err = base.InitBasicTypesByHexData()
 	if err != nil {
@@ -56,10 +60,37 @@ func New(url string) (*Client, error) {
 	return c, nil
 }
 
+func (c *Client) reConnectWs() (*gsrc.SubstrateAPI, error) {
+	cl, err := gsClient.Connect(c.url)
+	if err != nil {
+		return nil, err
+	}
+	newRPC, err := rpc.NewRPC(cl)
+	if err != nil {
+		return nil, err
+	}
+	return &gsrc.SubstrateAPI{
+		RPC:    newRPC,
+		Client: cl,
+	}, nil
+}
+
 func (c *Client) checkRuntimeVersion() error {
 	v, err := c.C.RPC.State.GetRuntimeVersionLatest()
 	if err != nil {
-		return fmt.Errorf("init runtime version error,err=%v", err)
+		if !strings.HasPrefix(err.Error(), "tls: use of closed connection") {
+			return fmt.Errorf("init runtime version error,err=%v", err)
+		}
+		//	重连处理，这是因为第三方包的问题，所以只能这样处理了了
+		cl, err := c.reConnectWs()
+		if err != nil {
+			return fmt.Errorf("reconnect error: %v", err)
+		}
+		c.C = cl
+		v, err = c.C.RPC.State.GetRuntimeVersionLatest()
+		if err != nil {
+			return fmt.Errorf("init runtime version error,aleady reconnect,err: %v", err)
+		}
 	}
 	c.TransactionVersion = int(v.TransactionVersion)
 	c.ChainName = v.SpecName
