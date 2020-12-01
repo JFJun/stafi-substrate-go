@@ -14,8 +14,8 @@ github.com/Azure/go-autorest/tracing v0.5.0/go.mod h1:r/s2XiOKccPW3HrqB+W0TQzfbt
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/ChainSafe/go-schnorrkel v0.0.0-20200626160457-b38283118816 h1:X5jJ3e/jgFSnSoYOep/mf6pF1RuLZfvF1ts8NZIyzqE=
 github.com/ChainSafe/go-schnorrkel v0.0.0-20200626160457-b38283118816/go.mod h1:URdX5+vg25ts3aCh8H5IFZybJYKWhJHYMTnf+ULtoC4=
-github.com/JFJun/go-substrate-crypto v0.0.1 h1:TtRsw0OjNIMGyqyK+3Alo96fX22/7tFwK3g329kzYas=
-github.com/JFJun/go-substrate-crypto v0.0.1/go.mod h1:/h4uuw81f/VKAR8O6DLQ6svXZxOXg/7qTlMFvQ5jfHA=
+github.com/JFJun/go-substrate-crypto v1.0.0 h1:vUd1bsK/nbAPKK+skXWX23z5QElxuYe65SVpWxVYJMY=
+github.com/JFJun/go-substrate-crypto v1.0.0/go.mod h1:/h4uuw81f/VKAR8O6DLQ6svXZxOXg/7qTlMFvQ5jfHA=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/StackExchange/wmi v0.0.0-20180116203802-5d049714c4a6 h1:fLjPD/aNc3UIOA6tDi6QXUemppXK3P9BI7mr2hd6gx8=
 github.com/StackExchange/wmi v0.0.0-20180116203802-5d049714c4a6/go.mod h1:3eOhrUMpNV+6aFIbp5/iudMxNCF27Vw2OZgy4xEx0Fg=

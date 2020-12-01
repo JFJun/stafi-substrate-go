@@ -1,0 +1,64 @@
+{
+  "coin_name": "dot",
+  "chain_name": "polkadot",
+  "version": "v12",
+  "spec_version": 26,
+  "types": [
+    {
+      "name": "Democracy_Blacklisted",
+      "sub_types": [
+        "Hash"
+      ]
+    },
+    {
+      "name": "ElectionsPhragmen_NewTerm",
+      "sub_types": [
+        "Vec<(AccountId, Balance)>"
+      ]
+    },
+    {
+      "name": "ElectionsPhragmen_EmptyTerm",
+      "sub_types": null
+    },
+    {
+      "name": "ElectionsPhragmen_ElectionError",
+      "sub_types": null
+    },
+    {
+      "name": "ElectionsPhragmen_MemberKicked",
+      "sub_types": [
+        "AccountId"
+      ]
+    },
+    {
+      "name": "ElectionsPhragmen_MemberRenounced",
+      "sub_types": [
+        "AccountId"
+      ]
+    },
+    {
+      "name": "ElectionsPhragmen_VoterReported",
+      "sub_types": [
+        "AccountId",
+        "AccountId",
+        "bool"
+      ]
+    },
+    {
+      "name": "Claims_Claimed",
+      "sub_types": [
+        "AccountId",
+        "EthereumAddress",
+        "Balance"
+      ]
+    },
+    {
+      "name": "Proxy_Announced",
+      "sub_types": [
+        "AccountId",
+        "AccountId",
+        "Hash"
+      ]
+    }
+  ]
+}

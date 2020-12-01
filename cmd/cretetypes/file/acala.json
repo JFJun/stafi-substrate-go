@@ -1,0 +1,980 @@
+{
+  "coin_name": "aca",
+  "chain_name": "mandala",
+  "version": "v12",
+  "spec_version": 606,
+  "types": [
+    {
+      "name": "Tokens_Transferred",
+      "sub_types": [
+        "CurrencyId",
+        "AccountId",
+        "AccountId",
+        "Balance"
+      ]
+    },
+    {
+      "name": "AcalaTreasury_Proposed",
+      "sub_types": [
+        "ProposalIndex"
+      ]
+    },
+    {
+      "name": "AcalaTreasury_Spending",
+      "sub_types": [
+        "Balance"
+      ]
+    },
+    {
+      "name": "AcalaTreasury_Awarded",
+      "sub_types": [
+        "ProposalIndex",
+        "Balance",
+        "AccountId"
+      ]
+    },
+    {
+      "name": "AcalaTreasury_Rejected",
+      "sub_types": [
+        "ProposalIndex",
+        "Balance"
+      ]
+    },
+    {
+      "name": "AcalaTreasury_Burnt",
+      "sub_types": [
+        "Balance"
+      ]
+    },
+    {
+      "name": "AcalaTreasury_Rollover",
+      "sub_types": [
+        "Balance"
+      ]
+    },
+    {
+      "name": "AcalaTreasury_Deposit",
+      "sub_types": [
+        "Balance"
+      ]
+    },
+    {
+      "name": "AcalaTreasury_NewTip",
+      "sub_types": [
+        "Hash"
+      ]
+    },
+    {
+      "name": "AcalaTreasury_TipClosing",
+      "sub_types": [
+        "Hash"
+      ]
+    },
+    {
+      "name": "AcalaTreasury_TipClosed",
+      "sub_types": [
+        "Hash",
+        "AccountId",
+        "Balance"
+      ]
+    },
+    {
+      "name": "AcalaTreasury_TipRetracted",
+      "sub_types": [
+        "Hash"
+      ]
+    },
+    {
+      "name": "AcalaTreasury_BountyProposed",
+      "sub_types": [
+        "BountyIndex"
+      ]
+    },
+    {
+      "name": "AcalaTreasury_BountyRejected",
+      "sub_types": [
+        "BountyIndex",
+        "Balance"
+      ]
+    },
+    {
+      "name": "AcalaTreasury_BountyBecameActive",
+      "sub_types": [
+        "BountyIndex"
+      ]
+    },
+    {
+      "name": "AcalaTreasury_BountyAwarded",
+      "sub_types": [
+        "BountyIndex",
+        "AccountId"
+      ]
+    },
+    {
+      "name": "AcalaTreasury_BountyClaimed",
+      "sub_types": [
+        "BountyIndex",
+        "Balance",
+        "AccountId"
+      ]
+    },
+    {
+      "name": "AcalaTreasury_BountyCanceled",
+      "sub_types": [
+        "BountyIndex"
+      ]
+    },
+    {
+      "name": "AcalaTreasury_BountyExtended",
+      "sub_types": [
+        "BountyIndex"
+      ]
+    },
+    {
+      "name": "Proxy_Announced",
+      "sub_types": [
+        "AccountId",
+        "AccountId",
+        "Hash"
+      ]
+    },
+    {
+      "name": "GraduallyUpdate_GraduallyUpdateAdded",
+      "sub_types": [
+        "StorageKey",
+        "StorageValue",
+        "StorageValue"
+      ]
+    },
+    {
+      "name": "GraduallyUpdate_GraduallyUpdateCancelled",
+      "sub_types": [
+        "StorageKey"
+      ]
+    },
+    {
+      "name": "GraduallyUpdate_Updated",
+      "sub_types": [
+        "BlockNumber",
+        "StorageKey",
+        "StorageValue"
+      ]
+    },
+    {
+      "name": "GeneralCouncil_Proposed",
+      "sub_types": [
+        "AccountId",
+        "ProposalIndex",
+        "Hash",
+        "MemberCount"
+      ]
+    },
+    {
+      "name": "GeneralCouncil_Voted",
+      "sub_types": [
+        "AccountId",
+        "Hash",
+        "bool",
+        "MemberCount",
+        "MemberCount"
+      ]
+    },
+    {
+      "name": "GeneralCouncil_Approved",
+      "sub_types": [
+        "Hash"
+      ]
+    },
+    {
+      "name": "GeneralCouncil_Disapproved",
+      "sub_types": [
+        "Hash"
+      ]
+    },
+    {
+      "name": "GeneralCouncil_Executed",
+      "sub_types": [
+        "Hash",
+        "DispatchResult"
+      ]
+    },
+    {
+      "name": "GeneralCouncil_MemberExecuted",
+      "sub_types": [
+        "Hash",
+        "DispatchResult"
+      ]
+    },
+    {
+      "name": "GeneralCouncil_Closed",
+      "sub_types": [
+        "Hash",
+        "MemberCount",
+        "MemberCount"
+      ]
+    },
+    {
+      "name": "GeneralCouncilMembership_MemberAdded",
+      "sub_types": null
+    },
+    {
+      "name": "GeneralCouncilMembership_MemberRemoved",
+      "sub_types": null
+    },
+    {
+      "name": "GeneralCouncilMembership_MembersSwapped",
+      "sub_types": null
+    },
+    {
+      "name": "GeneralCouncilMembership_MembersReset",
+      "sub_types": null
+    },
+    {
+      "name": "GeneralCouncilMembership_KeyChanged",
+      "sub_types": null
+    },
+    {
+      "name": "GeneralCouncilMembership_Dummy",
+      "sub_types": [
+        "sp_std::marker::PhantomData<(AccountId, Event)>"
+      ]
+    },
+    {
+      "name": "HonzonCouncil_Proposed",
+      "sub_types": [
+        "AccountId",
+        "ProposalIndex",
+        "Hash",
+        "MemberCount"
+      ]
+    },
+    {
+      "name": "HonzonCouncil_Voted",
+      "sub_types": [
+        "AccountId",
+        "Hash",
+        "bool",
+        "MemberCount",
+        "MemberCount"
+      ]
+    },
+    {
+      "name": "HonzonCouncil_Approved",
+      "sub_types": [
+        "Hash"
+      ]
+    },
+    {
+      "name": "HonzonCouncil_Disapproved",
+      "sub_types": [
+        "Hash"
+      ]
+    },
+    {
+      "name": "HonzonCouncil_Executed",
+      "sub_types": [
+        "Hash",
+        "DispatchResult"
+      ]
+    },
+    {
+      "name": "HonzonCouncil_MemberExecuted",
+      "sub_types": [
+        "Hash",
+        "DispatchResult"
+      ]
+    },
+    {
+      "name": "HonzonCouncil_Closed",
+      "sub_types": [
+        "Hash",
+        "MemberCount",
+        "MemberCount"
+      ]
+    },
+    {
+      "name": "HonzonCouncilMembership_MemberAdded",
+      "sub_types": null
+    },
+    {
+      "name": "HonzonCouncilMembership_MemberRemoved",
+      "sub_types": null
+    },
+    {
+      "name": "HonzonCouncilMembership_MembersSwapped",
+      "sub_types": null
+    },
+    {
+      "name": "HonzonCouncilMembership_MembersReset",
+      "sub_types": null
+    },
+    {
+      "name": "HonzonCouncilMembership_KeyChanged",
+      "sub_types": null
+    },
+    {
+      "name": "HonzonCouncilMembership_Dummy",
+      "sub_types": [
+        "sp_std::marker::PhantomData<(AccountId, Event)>"
+      ]
+    },
+    {
+      "name": "HomaCouncil_Proposed",
+      "sub_types": [
+        "AccountId",
+        "ProposalIndex",
+        "Hash",
+        "MemberCount"
+      ]
+    },
+    {
+      "name": "HomaCouncil_Voted",
+      "sub_types": [
+        "AccountId",
+        "Hash",
+        "bool",
+        "MemberCount",
+        "MemberCount"
+      ]
+    },
+    {
+      "name": "HomaCouncil_Approved",
+      "sub_types": [
+        "Hash"
+      ]
+    },
+    {
+      "name": "HomaCouncil_Disapproved",
+      "sub_types": [
+        "Hash"
+      ]
+    },
+    {
+      "name": "HomaCouncil_Executed",
+      "sub_types": [
+        "Hash",
+        "DispatchResult"
+      ]
+    },
+    {
+      "name": "HomaCouncil_MemberExecuted",
+      "sub_types": [
+        "Hash",
+        "DispatchResult"
+      ]
+    },
+    {
+      "name": "HomaCouncil_Closed",
+      "sub_types": [
+        "Hash",
+        "MemberCount",
+        "MemberCount"
+      ]
+    },
+    {
+      "name": "HomaCouncilMembership_MemberAdded",
+      "sub_types": null
+    },
+    {
+      "name": "HomaCouncilMembership_MemberRemoved",
+      "sub_types": null
+    },
+    {
+      "name": "HomaCouncilMembership_MembersSwapped",
+      "sub_types": null
+    },
+    {
+      "name": "HomaCouncilMembership_MembersReset",
+      "sub_types": null
+    },
+    {
+      "name": "HomaCouncilMembership_KeyChanged",
+      "sub_types": null
+    },
+    {
+      "name": "HomaCouncilMembership_Dummy",
+      "sub_types": [
+        "sp_std::marker::PhantomData<(AccountId, Event)>"
+      ]
+    },
+    {
+      "name": "TechnicalCommitteeMembership_MemberAdded",
+      "sub_types": null
+    },
+    {
+      "name": "TechnicalCommitteeMembership_MemberRemoved",
+      "sub_types": null
+    },
+    {
+      "name": "TechnicalCommitteeMembership_MembersSwapped",
+      "sub_types": null
+    },
+    {
+      "name": "TechnicalCommitteeMembership_MembersReset",
+      "sub_types": null
+    },
+    {
+      "name": "TechnicalCommitteeMembership_KeyChanged",
+      "sub_types": null
+    },
+    {
+      "name": "TechnicalCommitteeMembership_Dummy",
+      "sub_types": [
+        "sp_std::marker::PhantomData<(AccountId, Event)>"
+      ]
+    },
+    {
+      "name": "Authority_Dispatched",
+      "sub_types": [
+        "DispatchResult"
+      ]
+    },
+    {
+      "name": "Authority_Scheduled",
+      "sub_types": [
+        "PalletsOrigin",
+        "ScheduleTaskIndex"
+      ]
+    },
+    {
+      "name": "Authority_FastTracked",
+      "sub_types": [
+        "PalletsOrigin",
+        "ScheduleTaskIndex",
+        "BlockNumber"
+      ]
+    },
+    {
+      "name": "Authority_Delayed",
+      "sub_types": [
+        "PalletsOrigin",
+        "ScheduleTaskIndex",
+        "BlockNumber"
+      ]
+    },
+    {
+      "name": "Authority_Cancelled",
+      "sub_types": [
+        "PalletsOrigin",
+        "ScheduleTaskIndex"
+      ]
+    },
+    {
+      "name": "ElectionsPhragmen_NewTerm",
+      "sub_types": [
+        "Vec<(AccountId, Balance)>"
+      ]
+    },
+    {
+      "name": "ElectionsPhragmen_EmptyTerm",
+      "sub_types": null
+    },
+    {
+      "name": "ElectionsPhragmen_MemberKicked",
+      "sub_types": [
+        "AccountId"
+      ]
+    },
+    {
+      "name": "ElectionsPhragmen_MemberRenounced",
+      "sub_types": [
+        "AccountId"
+      ]
+    },
+    {
+      "name": "ElectionsPhragmen_VoterReported",
+      "sub_types": [
+        "AccountId",
+        "AccountId",
+        "bool"
+      ]
+    },
+    {
+      "name": "AcalaOracle_NewFeedData",
+      "sub_types": [
+        "AccountId",
+        "Vec<(OracleKey, OracleValue)>"
+      ]
+    },
+    {
+      "name": "BandOracle_NewFeedData",
+      "sub_types": [
+        "AccountId",
+        "Vec<(OracleKey, OracleValue)>"
+      ]
+    },
+    {
+      "name": "OperatorMembershipAcala_MemberAdded",
+      "sub_types": null
+    },
+    {
+      "name": "OperatorMembershipAcala_MemberRemoved",
+      "sub_types": null
+    },
+    {
+      "name": "OperatorMembershipAcala_MembersSwapped",
+      "sub_types": null
+    },
+    {
+      "name": "OperatorMembershipAcala_MembersReset",
+      "sub_types": null
+    },
+    {
+      "name": "OperatorMembershipAcala_KeyChanged",
+      "sub_types": null
+    },
+    {
+      "name": "OperatorMembershipAcala_Dummy",
+      "sub_types": [
+        "sp_std::marker::PhantomData<(AccountId, Event)>"
+      ]
+    },
+    {
+      "name": "OperatorMembershipBand_MemberAdded",
+      "sub_types": null
+    },
+    {
+      "name": "OperatorMembershipBand_MemberRemoved",
+      "sub_types": null
+    },
+    {
+      "name": "OperatorMembershipBand_MembersSwapped",
+      "sub_types": null
+    },
+    {
+      "name": "OperatorMembershipBand_MembersReset",
+      "sub_types": null
+    },
+    {
+      "name": "OperatorMembershipBand_KeyChanged",
+      "sub_types": null
+    },
+    {
+      "name": "OperatorMembershipBand_Dummy",
+      "sub_types": [
+        "sp_std::marker::PhantomData<(AccountId, Event)>"
+      ]
+    },
+    {
+      "name": "Auction_Bid",
+      "sub_types": [
+        "AuctionId",
+        "AccountId",
+        "Balance"
+      ]
+    },
+    {
+      "name": "Prices_LockPrice",
+      "sub_types": [
+        "CurrencyId",
+        "Price"
+      ]
+    },
+    {
+      "name": "Prices_UnlockPrice",
+      "sub_types": [
+        "CurrencyId"
+      ]
+    },
+    {
+      "name": "Dex_AddLiquidity",
+      "sub_types": [
+        "AccountId",
+        "CurrencyId",
+        "Balance",
+        "CurrencyId",
+        "Balance",
+        "Balance"
+      ]
+    },
+    {
+      "name": "Dex_RemoveLiquidity",
+      "sub_types": [
+        "AccountId",
+        "CurrencyId",
+        "Balance",
+        "CurrencyId",
+        "Balance",
+        "Balance"
+      ]
+    },
+    {
+      "name": "Dex_Swap",
+      "sub_types": [
+        "AccountId",
+        "Vec<CurrencyId>",
+        "Balance",
+        "Balance"
+      ]
+    },
+    {
+      "name": "AuctionManager_NewCollateralAuction",
+      "sub_types": [
+        "AuctionId",
+        "CurrencyId",
+        "Balance",
+        "Balance"
+      ]
+    },
+    {
+      "name": "AuctionManager_NewDebitAuction",
+      "sub_types": [
+        "AuctionId",
+        "Balance",
+        "Balance"
+      ]
+    },
+    {
+      "name": "AuctionManager_NewSurplusAuction",
+      "sub_types": [
+        "AuctionId",
+        "Balance"
+      ]
+    },
+    {
+      "name": "AuctionManager_CancelAuction",
+      "sub_types": [
+        "AuctionId"
+      ]
+    },
+    {
+      "name": "AuctionManager_CollateralAuctionDealt",
+      "sub_types": [
+        "AuctionId",
+        "CurrencyId",
+        "Balance",
+        "AccountId",
+        "Balance"
+      ]
+    },
+    {
+      "name": "AuctionManager_SurplusAuctionDealt",
+      "sub_types": [
+        "AuctionId",
+        "Balance",
+        "AccountId",
+        "Balance"
+      ]
+    },
+    {
+      "name": "AuctionManager_DebitAuctionDealt",
+      "sub_types": [
+        "AuctionId",
+        "Balance",
+        "AccountId",
+        "Balance"
+      ]
+    },
+    {
+      "name": "AuctionManager_DEXTakeCollateralAuction",
+      "sub_types": [
+        "AuctionId",
+        "CurrencyId",
+        "Balance",
+        "Balance"
+      ]
+    },
+    {
+      "name": "Loans_PositionUpdated",
+      "sub_types": [
+        "AccountId",
+        "CurrencyId",
+        "Amount",
+        "Amount"
+      ]
+    },
+    {
+      "name": "Loans_ConfiscateCollateralAndDebit",
+      "sub_types": [
+        "AccountId",
+        "CurrencyId",
+        "Balance",
+        "Balance"
+      ]
+    },
+    {
+      "name": "Loans_TransferLoan",
+      "sub_types": [
+        "AccountId",
+        "AccountId",
+        "CurrencyId"
+      ]
+    },
+    {
+      "name": "Honzon_Authorization",
+      "sub_types": [
+        "AccountId",
+        "AccountId",
+        "CurrencyId"
+      ]
+    },
+    {
+      "name": "Honzon_UnAuthorization",
+      "sub_types": [
+        "AccountId",
+        "AccountId",
+        "CurrencyId"
+      ]
+    },
+    {
+      "name": "Honzon_UnAuthorizationAll",
+      "sub_types": [
+        "AccountId"
+      ]
+    },
+    {
+      "name": "CdpTreasury_CollateralAuctionMaximumSizeUpdated",
+      "sub_types": [
+        "CurrencyId",
+        "Balance"
+      ]
+    },
+    {
+      "name": "CdpEngine_LiquidateUnsafeCDP",
+      "sub_types": [
+        "CurrencyId",
+        "AccountId",
+        "Balance",
+        "Balance",
+        "LiquidationStrategy"
+      ]
+    },
+    {
+      "name": "CdpEngine_SettleCDPInDebit",
+      "sub_types": [
+        "CurrencyId",
+        "AccountId"
+      ]
+    },
+    {
+      "name": "CdpEngine_StabilityFeeUpdated",
+      "sub_types": [
+        "CurrencyId",
+        "Option<Rate>"
+      ]
+    },
+    {
+      "name": "CdpEngine_LiquidationRatioUpdated",
+      "sub_types": [
+        "CurrencyId",
+        "Option<Ratio>"
+      ]
+    },
+    {
+      "name": "CdpEngine_LiquidationPenaltyUpdated",
+      "sub_types": [
+        "CurrencyId",
+        "Option<Rate>"
+      ]
+    },
+    {
+      "name": "CdpEngine_RequiredCollateralRatioUpdated",
+      "sub_types": [
+        "CurrencyId",
+        "Option<Ratio>"
+      ]
+    },
+    {
+      "name": "CdpEngine_MaximumTotalDebitValueUpdated",
+      "sub_types": [
+        "CurrencyId",
+        "Balance"
+      ]
+    },
+    {
+      "name": "CdpEngine_GlobalStabilityFeeUpdated",
+      "sub_types": [
+        "Rate"
+      ]
+    },
+    {
+      "name": "EmergencyShutdown_Shutdown",
+      "sub_types": [
+        "BlockNumber"
+      ]
+    },
+    {
+      "name": "EmergencyShutdown_OpenRefund",
+      "sub_types": [
+        "BlockNumber"
+      ]
+    },
+    {
+      "name": "EmergencyShutdown_Refund",
+      "sub_types": [
+        "AccountId",
+        "Balance",
+        "Vec<(CurrencyId, Balance)>"
+      ]
+    },
+    {
+      "name": "StakingPool_MintLiquid",
+      "sub_types": [
+        "AccountId",
+        "Balance",
+        "Balance"
+      ]
+    },
+    {
+      "name": "StakingPool_RedeemByUnbond",
+      "sub_types": [
+        "AccountId",
+        "Balance",
+        "Balance"
+      ]
+    },
+    {
+      "name": "StakingPool_RedeemByFreeUnbonded",
+      "sub_types": [
+        "AccountId",
+        "Balance",
+        "Balance",
+        "Balance"
+      ]
+    },
+    {
+      "name": "StakingPool_RedeemByClaimUnbonding",
+      "sub_types": [
+        "AccountId",
+        "EraIndex",
+        "Balance",
+        "Balance",
+        "Balance"
+      ]
+    },
+    {
+      "name": "Incentives_DepositDEXShare",
+      "sub_types": [
+        "AccountId",
+        "CurrencyId",
+        "Balance"
+      ]
+    },
+    {
+      "name": "Incentives_WithdrawDEXShare",
+      "sub_types": [
+        "AccountId",
+        "CurrencyId",
+        "Balance"
+      ]
+    },
+    {
+      "name": "AirDrop_Airdrop",
+      "sub_types": [
+        "AccountId",
+        "AirDropCurrencyId",
+        "Balance"
+      ]
+    },
+    {
+      "name": "AirDrop_UpdateAirdrop",
+      "sub_types": [
+        "AccountId",
+        "AirDropCurrencyId",
+        "Balance"
+      ]
+    },
+    {
+      "name": "NFT_CreatedClass",
+      "sub_types": [
+        "AccountId",
+        "ClassId"
+      ]
+    },
+    {
+      "name": "NFT_MintedToken",
+      "sub_types": [
+        "AccountId",
+        "AccountId",
+        "ClassId",
+        "u32"
+      ]
+    },
+    {
+      "name": "NFT_TransferedToken",
+      "sub_types": [
+        "AccountId",
+        "AccountId",
+        "ClassId",
+        "TokenId"
+      ]
+    },
+    {
+      "name": "NFT_BurnedToken",
+      "sub_types": [
+        "AccountId",
+        "ClassId",
+        "TokenId"
+      ]
+    },
+    {
+      "name": "NFT_DestroyedClass",
+      "sub_types": [
+        "AccountId",
+        "ClassId",
+        "AccountId"
+      ]
+    },
+    {
+      "name": "RenVmBridge_Minted",
+      "sub_types": [
+        "AccountId",
+        "Balance"
+      ]
+    },
+    {
+      "name": "RenVmBridge_Burnt",
+      "sub_types": [
+        "AccountId",
+        "DestAddress",
+        "Balance"
+      ]
+    },
+    {
+      "name": "EVM_Log",
+      "sub_types": [
+        "Log"
+      ]
+    },
+    {
+      "name": "EVM_Created",
+      "sub_types": [
+        "H160"
+      ]
+    },
+    {
+      "name": "EVM_CreatedFailed",
+      "sub_types": [
+        "H160"
+      ]
+    },
+    {
+      "name": "EVM_Executed",
+      "sub_types": [
+        "H160"
+      ]
+    },
+    {
+      "name": "EVM_ExecutedFailed",
+      "sub_types": [
+        "H160"
+      ]
+    },
+    {
+      "name": "EVM_BalanceDeposit",
+      "sub_types": [
+        "AccountId",
+        "H160",
+        "U256"
+      ]
+    },
+    {
+      "name": "EVM_BalanceWithdraw",
+      "sub_types": [
+        "AccountId",
+        "H160",
+        "U256"
+      ]
+    }
+  ]
+}

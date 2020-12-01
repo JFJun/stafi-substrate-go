@@ -1,0 +1,278 @@
+{
+  "coin_name": "cring",
+  "chain_name": "Crab",
+  "version": "v12",
+  "spec_version": 28,
+  "types": [
+    {
+      "name": "Kton_Endowed",
+      "sub_types": [
+        "AccountId",
+        "Balance"
+      ]
+    },
+    {
+      "name": "Kton_DustLost",
+      "sub_types": [
+        "AccountId",
+        "Balance"
+      ]
+    },
+    {
+      "name": "Kton_Transfer",
+      "sub_types": [
+        "AccountId",
+        "AccountId",
+        "Balance"
+      ]
+    },
+    {
+      "name": "Kton_BalanceSet",
+      "sub_types": [
+        "AccountId",
+        "Balance",
+        "Balance"
+      ]
+    },
+    {
+      "name": "Kton_Deposit",
+      "sub_types": [
+        "AccountId",
+        "Balance"
+      ]
+    },
+    {
+      "name": "Kton_Reserved",
+      "sub_types": [
+        "AccountId",
+        "Balance"
+      ]
+    },
+    {
+      "name": "Kton_Unreserved",
+      "sub_types": [
+        "AccountId",
+        "Balance"
+      ]
+    },
+    {
+      "name": "Kton_ReserveRepatriated",
+      "sub_types": [
+        "AccountId",
+        "AccountId",
+        "Balance",
+        "Status"
+      ]
+    },
+    {
+      "name": "Staking_BondRing",
+      "sub_types": [
+        "RingBalance",
+        "TsInMs",
+        "TsInMs"
+      ]
+    },
+    {
+      "name": "Staking_BondKton",
+      "sub_types": [
+        "KtonBalance"
+      ]
+    },
+    {
+      "name": "Staking_UnbondRing",
+      "sub_types": [
+        "RingBalance",
+        "BlockNumber"
+      ]
+    },
+    {
+      "name": "Staking_UnbondKton",
+      "sub_types": [
+        "KtonBalance",
+        "BlockNumber"
+      ]
+    },
+    {
+      "name": "Staking_ClaimDepositsWithPunish",
+      "sub_types": [
+        "AccountId",
+        "KtonBalance"
+      ]
+    },
+    {
+      "name": "ElectionsPhragmen_NewTerm",
+      "sub_types": [
+        "Vec<(AccountId, Balance)>"
+      ]
+    },
+    {
+      "name": "ElectionsPhragmen_EmptyTerm",
+      "sub_types": null
+    },
+    {
+      "name": "ElectionsPhragmen_ElectionError",
+      "sub_types": null
+    },
+    {
+      "name": "ElectionsPhragmen_MemberKicked",
+      "sub_types": [
+        "AccountId"
+      ]
+    },
+    {
+      "name": "ElectionsPhragmen_MemberRenounced",
+      "sub_types": [
+        "AccountId"
+      ]
+    },
+    {
+      "name": "ElectionsPhragmen_VoterReported",
+      "sub_types": [
+        "AccountId",
+        "AccountId",
+        "bool"
+      ]
+    },
+    {
+      "name": "Claims_Claimed",
+      "sub_types": [
+        "AccountId",
+        "AddressT",
+        "RingBalance"
+      ]
+    },
+    {
+      "name": "EthereumBacking_RedeemRing",
+      "sub_types": [
+        "AccountId",
+        "Balance",
+        "EthereumTransactionIndex"
+      ]
+    },
+    {
+      "name": "EthereumBacking_RedeemKton",
+      "sub_types": [
+        "AccountId",
+        "Balance",
+        "EthereumTransactionIndex"
+      ]
+    },
+    {
+      "name": "EthereumBacking_RedeemDeposit",
+      "sub_types": [
+        "AccountId",
+        "DepositId",
+        "RingBalance",
+        "EthereumTransactionIndex"
+      ]
+    },
+    {
+      "name": "EthereumRelay_Affirmed",
+      "sub_types": [
+        "AccountId",
+        "RelayAffirmationId"
+      ]
+    },
+    {
+      "name": "EthereumRelay_DisputedAndAffirmed",
+      "sub_types": [
+        "AccountId",
+        "RelayAffirmationId"
+      ]
+    },
+    {
+      "name": "EthereumRelay_Extended",
+      "sub_types": [
+        "AccountId",
+        "RelayAffirmationId"
+      ]
+    },
+    {
+      "name": "EthereumRelay_NewRound",
+      "sub_types": [
+        "EthereumBlockNumber",
+        "Vec<EthereumBlockNumber>"
+      ]
+    },
+    {
+      "name": "EthereumRelay_GameOver",
+      "sub_types": [
+        "EthereumBlockNumber"
+      ]
+    },
+    {
+      "name": "EthereumRelay_RemoveConfirmedParcel",
+      "sub_types": [
+        "EthereumBlockNumber"
+      ]
+    },
+    {
+      "name": "EthereumRelay_VerifyReceipt",
+      "sub_types": [
+        "AccountId",
+        "EthereumReceipt",
+        "EthereumHeader"
+      ]
+    },
+    {
+      "name": "EthereumRelay_Pended",
+      "sub_types": [
+        "EthereumBlockNumber"
+      ]
+    },
+    {
+      "name": "EthereumRelay_GuardVoted",
+      "sub_types": [
+        "EthereumBlockNumber",
+        "bool"
+      ]
+    },
+    {
+      "name": "EthereumRelay_PendingRelayHeaderParcelConfirmed",
+      "sub_types": [
+        "EthereumBlockNumber",
+        "Vec<u8>"
+      ]
+    },
+    {
+      "name": "EthereumRelay_PendingRelayHeaderParcelRejected",
+      "sub_types": [
+        "EthereumBlockNumber"
+      ]
+    },
+    {
+      "name": "Treasury_DepositRing",
+      "sub_types": [
+        "RingBalance"
+      ]
+    },
+    {
+      "name": "Treasury_DepositKton",
+      "sub_types": [
+        "KtonBalance"
+      ]
+    },
+    {
+      "name": "Proxy_Announced",
+      "sub_types": [
+        "AccountId",
+        "AccountId",
+        "Hash"
+      ]
+    },
+    {
+      "name": "CrabIssuing_DummyEvent",
+      "sub_types": [
+        "AccountId",
+        "RingBalance",
+        "MappedRing"
+      ]
+    },
+    {
+      "name": "Democracy_Blacklisted",
+      "sub_types": [
+        "Hash"
+      ]
+    }
+  ]
+}

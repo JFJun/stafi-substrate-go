@@ -1,31 +1,120 @@
-package test
+package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/JFJun/stafi-substrate-go/client"
-	"testing"
 )
 
-func Test_Chain(t *testing.T) {
-	c, err := client.New("wss://mainnet-rpc.stafi.io")
+func main() {
+	url := "http://fis.rylink.io:31833"
+	err := createTypes("fis", url)
 	if err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
-	fmt.Println(c.ChainName)
-	for _, mod := range c.Meta.AsMetadataV12.Modules {
+}
+
+func createBaseTypesJson(url string) error {
+	c, err := client.New(url)
+	if err != nil {
+		return err
+	}
+	tj := new(TypesJson)
+	tj.CoinName = "base"
+	tj.SpecVersion = c.SpecVersion
+	tj.ChainName = c.ChainName
+
+	for _, mod := range c.Meta.AsMetadataV11.Modules {
+		tj.Version = "v11"
 		if mod.HasEvents {
 			for _, event := range mod.Events {
 				typeName := fmt.Sprintf("%s_%s", mod.Name, event.Name)
 				if IsExist(typeName) {
-					continue
+					var t EventType
+					t.Name = typeName
+					for _, arg := range event.Args {
+						t.SubTypes = append(t.SubTypes, string(arg))
+					}
+					tj.Types = append(tj.Types, t)
 				}
-				fmt.Printf("%s		[]Event%s%s\n", typeName, mod.Name, event.Name)
-				fmt.Printf("type Event%s%s struct { \n	Phase    types.Phase\n	%v\n	Topics []types.Hash\n}\n", mod.Name, event.Name, event.Args)
-				//fmt.Println(event.Args)
-				fmt.Println("------------------------------------------------")
 			}
 		}
 	}
+
+	for _, mod := range c.Meta.AsMetadataV12.Modules {
+		tj.Version = "v12"
+		if mod.HasEvents {
+			for _, event := range mod.Events {
+				typeName := fmt.Sprintf("%s_%s", mod.Name, event.Name)
+				if IsExist(typeName) {
+					var t EventType
+					t.Name = typeName
+					for _, arg := range event.Args {
+						t.SubTypes = append(t.SubTypes, string(arg))
+					}
+					tj.Types = append(tj.Types, t)
+				}
+			}
+		}
+	}
+	d, err := json.Marshal(tj)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(d))
+	return nil
+}
+
+func createTypes(coinName, url string) error {
+	c, err := client.New(url)
+	if err != nil {
+		return err
+	}
+	tj := new(TypesJson)
+	tj.CoinName = coinName
+	tj.SpecVersion = c.SpecVersion
+	tj.ChainName = c.ChainName
+
+	for _, mod := range c.Meta.AsMetadataV11.Modules {
+		tj.Version = "v11"
+		if mod.HasEvents {
+			for _, event := range mod.Events {
+				typeName := fmt.Sprintf("%s_%s", mod.Name, event.Name)
+				if !IsExist(typeName) {
+					var t EventType
+					t.Name = typeName
+					for _, arg := range event.Args {
+						t.SubTypes = append(t.SubTypes, string(arg))
+					}
+					tj.Types = append(tj.Types, t)
+				}
+			}
+		}
+	}
+
+	for _, mod := range c.Meta.AsMetadataV12.Modules {
+		tj.Version = "v12"
+		if mod.HasEvents {
+			for _, event := range mod.Events {
+				typeName := fmt.Sprintf("%s_%s", mod.Name, event.Name)
+				if !IsExist(typeName) {
+					var t EventType
+					t.Name = typeName
+					for _, arg := range event.Args {
+						t.SubTypes = append(t.SubTypes, string(arg))
+					}
+					tj.Types = append(tj.Types, t)
+				}
+			}
+		}
+	}
+
+	d, err := json.Marshal(tj)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(d))
+	return nil
 }
 
 var existTypes = []string{
@@ -194,6 +283,7 @@ var existTypes = []string{
 	"Proxy_Announced",
 }
 
+// 269-108 = 161 = 141+4+15
 func IsExist(typeName string) bool {
 	for _, v := range existTypes {
 		if typeName == v {
@@ -203,11 +293,15 @@ func IsExist(typeName string) bool {
 	return false
 }
 
-func Test_GetMetadata(t *testing.T) {
-	c, err := client.New("wss://node-6714447553211260928.rz.onfinality.io/ws")
-	if err != nil {
-		t.Fatal(err)
-	}
-	fmt.Println(c.ChainName)
+type TypesJson struct {
+	CoinName    string      `json:"coin_name"`
+	ChainName   string      `json:"chain_name"`
+	Version     string      `json:"version"`
+	SpecVersion int         `json:"spec_version"`
+	Types       []EventType `json:"types"`
+}
 
+type EventType struct {
+	Name     string   `json:"name"`
+	SubTypes []string `json:"sub_types"`
 }
