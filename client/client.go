@@ -465,55 +465,6 @@ func (c *Client) GetAccountInfo(address string) (*types.AccountInfo, error) {
 	return &accountInfo, nil
 }
 
-//func (c *Client)calcFee2(blockResp *models.BlockResponse,weight,len int64)(string,error){
-//	var parentHash,parentParentHash 	types.Hash
-//	var err error
-//	parentHash,err = types.NewHashFromHexString(blockResp.ParentHash)
-//	if err != nil {
-//		return "", fmt.Errorf("new parent  hash error:%v",err)
-//	}
-//	if blockResp.Height>1 {
-//		header,err:=c.C.RPC.Chain.GetHeader(parentHash)
-//		if err != nil {
-//			return "", fmt.Errorf("get parent hash header error: %v",err)
-//		}
-//		parentParentHash = header.ParentHash
-//	}else{
-//		parentParentHash = parentHash
-//	}
-//	storage, err := types.CreateStorageKey(c.Meta, "TransactionPayment", "NextFeeMultiplier", nil, nil)
-//	if err != nil {
-//		return "", fmt.Errorf("create storage key error: %v",err)
-//	}
-//	var multiplier types.U128
-//	var ok bool
-//	ok,err = c.C.RPC.State.GetStorage(storage, &multiplier, parentParentHash)
-//	if err != nil || !ok {
-//		return "", fmt.Errorf("get storage error: %v",err)
-//	}
-//	c.cf.SetMultiplier(multiplier.Int64())
-//	//get weight
-//	fee:=c.cf.CalcPartialFee(weight,len)
-//	return fmt.Sprintf("%d",fee),nil
-//}
-//func (c *Client) getWeight(events *types.EventRecords, extrinsicIdx int) int64 {
-//	if len(events.System_ExtrinsicFailed) > 0 {
-//		for _, ef := range events.System_ExtrinsicFailed {
-//			if int(ef.Phase.AsApplyExtrinsic) == extrinsicIdx {
-//				return int64(ef.DispatchInfo.Weight)
-//			}
-//		}
-//	}
-//	if len(events.System_ExtrinsicSuccess) > 0 {
-//		for _, es := range events.System_ExtrinsicSuccess {
-//			if int(es.Phase.AsApplyExtrinsic) == extrinsicIdx {
-//				return int64(es.DispatchInfo.Weight)
-//			}
-//		}
-//	}
-//	return 0
-//}
-
 func (c *Client) GetPartialFee(extrinsic, parentHash string) (string, error) {
 	if !strings.HasPrefix(extrinsic, "0x") {
 		extrinsic = "0x" + extrinsic
