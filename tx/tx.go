@@ -128,7 +128,7 @@ func (tx *Transaction) checkTxParams() error {
 }
 
 /*
-signType: 0-->ecdsa   1--> sr25519
+signType: 0-->ed25519   1--> sr25519		2--> ecdsa
 */
 func (tx *Transaction) SignTransaction(privateKey string, signType int) (string, error) {
 	var (
@@ -247,10 +247,10 @@ func (tx *Transaction) signTx(e *types.Extrinsic, o types.SignatureOptions, priv
 	}
 	signerPubKey := types.NewAddressFromAccountID(types.MustHexDecodeString(
 		tx.SenderPubkey))
-
+	//fmt.Println(hex.EncodeToString(sig))
 	var ss types.MultiSignature
-	if signType == crypto.EcdsaType {
-		ss = types.MultiSignature{IsEcdsa: true, AsEcdsa: types.NewBytes(sig)}
+	if signType == crypto.Ed25519Type {
+		ss = types.MultiSignature{IsEd25519: true, AsEd25519: types.NewSignature(sig)}
 	} else if signType == crypto.Sr25519Type {
 		ss = types.MultiSignature{IsSr25519: true, AsSr25519: types.NewSignature(sig)}
 	} else {
