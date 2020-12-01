@@ -1,0 +1,143 @@
+{
+  "coin_name": "cru",
+  "chain_name": "crust",
+  "version": "v12",
+  "spec_version": 7,
+  "types": [
+    {
+      "name": "Staking_EraReward",
+      "sub_types": [
+        "EraIndex",
+        "Balance",
+        "Balance"
+      ]
+    },
+    {
+      "name": "Staking_ValidateSuccess",
+      "sub_types": [
+        "AccountId",
+        "ValidatorPrefs"
+      ]
+    },
+    {
+      "name": "Staking_GuaranteeSuccess",
+      "sub_types": [
+        "AccountId",
+        "AccountId",
+        "Balance"
+      ]
+    },
+    {
+      "name": "Staking_ChillSuccess",
+      "sub_types": [
+        "AccountId",
+        "AccountId"
+      ]
+    },
+    {
+      "name": "Staking_UpdateIdentitiesSuccess",
+      "sub_types": [
+        "EraIndex"
+      ]
+    },
+    {
+      "name": "Swork_RegisterSuccess",
+      "sub_types": [
+        "AccountId",
+        "SworkerPubKey"
+      ]
+    },
+    {
+      "name": "Swork_WorksReportSuccess",
+      "sub_types": [
+        "AccountId",
+        "SworkerPubKey"
+      ]
+    },
+    {
+      "name": "Swork_ABUpgradeSuccess",
+      "sub_types": [
+        "AccountId",
+        "SworkerPubKey",
+        "SworkerPubKey"
+      ]
+    },
+    {
+      "name": "Swork_ChillSuccess",
+      "sub_types": [
+        "AccountId",
+        "SworkerPubKey"
+      ]
+    },
+    {
+      "name": "Swork_EnclaveUpgradeSuccess",
+      "sub_types": [
+        "SworkerCode",
+        "BlockNumber"
+      ]
+    },
+    {
+      "name": "Market_StorageOrderSuccess",
+      "sub_types": [
+        "AccountId",
+        "SorderInfo<AccountId, Balance>",
+        "SorderStatus"
+      ]
+    },
+    {
+      "name": "Market_RegisterSuccess",
+      "sub_types": [
+        "AccountId"
+      ]
+    },
+    {
+      "name": "Market_PledgeSuccess",
+      "sub_types": [
+        "AccountId"
+      ]
+    },
+    {
+      "name": "Market_SetAliasSuccess",
+      "sub_types": [
+        "AccountId",
+        "FileAlias",
+        "FileAlias"
+      ]
+    },
+    {
+      "name": "Market_PaysOrderSuccess",
+      "sub_types": [
+        "AccountId"
+      ]
+    },
+    {
+      "name": "Candy_CandyIssued",
+      "sub_types": [
+        "AccountId",
+        "Balance"
+      ]
+    },
+    {
+      "name": "Candy_CandyTransferred",
+      "sub_types": [
+        "AccountId",
+        "AccountId",
+        "Balance"
+      ]
+    },
+    {
+      "name": "Candy_CandyBurned",
+      "sub_types": [
+        "AccountId",
+        "Balance"
+      ]
+    },
+    {
+      "name": "Candy_BondEthSuccess",
+      "sub_types": [
+        "AccountId",
+        "ETHAddress"
+      ]
+    }
+  ]
+}

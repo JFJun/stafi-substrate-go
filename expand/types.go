@@ -220,7 +220,7 @@ func (u *U32) Decode(decoder scale.Decoder) error {
 // AccountInfo contains information of an account
 type StafiAccountInfo struct {
 	Nonce    types.U32
-	Refcount types.U8
+	RefCount types.U8
 	Data     struct {
 		Free       types.U128
 		Reserved   types.U128

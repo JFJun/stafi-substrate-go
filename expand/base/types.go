@@ -223,6 +223,20 @@ func (d *VecU8L256) Decode(decoder scale.Decoder) error {
 	return nil
 }
 
+type VecU8L32 struct {
+	Value string
+}
+
+func (d *VecU8L32) Decode(decoder scale.Decoder) error {
+	data := make([]byte, 32)
+	err := decoder.Read(data)
+	if err != nil {
+		return fmt.Errorf("U8L32 read bytes error: %v", err)
+	}
+	d.Value = hex.EncodeToString(data)
+	return nil
+}
+
 /*
 https://github.com/polkadot-js/api/blob/2906b02e413050be04980f472abb69a6991ad5e5/packages/types/src/interfaces/runtime/definitions.ts
 */

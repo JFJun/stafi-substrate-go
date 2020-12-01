@@ -458,20 +458,9 @@ func (c *Client) GetAccountInfo(address string) (*types.AccountInfo, error) {
 	}
 	var accountInfo types.AccountInfo
 	var ok bool
-	if bytes.Equal(c.prefix, ss58.StafiPrefix) {
-		var ai expand.StafiAccountInfo
-		ok, err = c.C.RPC.State.GetStorageLatest(storage, &ai)
-		if err != nil || !ok {
-			return nil, fmt.Errorf("get account info error: %v", err)
-		}
-		accountInfo.Nonce = ai.Nonce
-		accountInfo.Refcount = types.NewU32(uint32(ai.Refcount))
-		accountInfo.Data = ai.Data
-	} else {
-		ok, err = c.C.RPC.State.GetStorageLatest(storage, &accountInfo)
-		if err != nil || !ok {
-			return nil, fmt.Errorf("get account info error: %v", err)
-		}
+	ok, err = c.C.RPC.State.GetStorageLatest(storage, &accountInfo)
+	if err != nil || !ok {
+		return nil, fmt.Errorf("get account info error: %v", err)
 	}
 	return &accountInfo, nil
 }
