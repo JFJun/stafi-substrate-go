@@ -49,7 +49,7 @@ func Test_tx(t *testing.T) {
 	}
 	fmt.Println(btCall)
 	transaction.SetSpecVersionAndCallId(uint32(v.SpecVersion), uint32(v.TransactionVersion), btCall)
-	tt, err := transaction.SignTransaction("0f0a035d35bc540a7bf51889b03fe0a89f3536038222536b39a2bd91233a22bc", crypto.Sr25519Type)
+	tt, err := transaction.SignTransaction("000", crypto.Sr25519Type)
 	if err != nil {
 		t.Fatal(err)
 	}
