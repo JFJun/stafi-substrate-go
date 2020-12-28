@@ -3,10 +3,10 @@ package expand
 import (
 	"github.com/JFJun/stafi-substrate-go/expand/acala"
 	"github.com/JFJun/stafi-substrate-go/expand/base"
-	"github.com/JFJun/stafi-substrate-go/expand/bifrost"
 	"github.com/JFJun/stafi-substrate-go/expand/chainX"
 	"github.com/JFJun/stafi-substrate-go/expand/crust"
 	"github.com/JFJun/stafi-substrate-go/expand/darwinia"
+	"github.com/JFJun/stafi-substrate-go/expand/ori"
 	"github.com/JFJun/stafi-substrate-go/expand/stafi"
 	"github.com/stafiprotocol/go-substrate-rpc-client/types"
 	"strings"
@@ -60,8 +60,8 @@ func DecodeEventRecords(meta *types.Metadata, rawData string, chainName string) 
 			return nil, err
 		}
 		ier = &events
-	case "bifrost":
-		var events bifrost.BifrostEventRecords
+	case "orion":
+		var events ori.OrionEventRecords
 		err := e.DecodeEventRecords(meta, &events)
 		if err != nil {
 			return nil, err

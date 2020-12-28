@@ -7,7 +7,7 @@ import (
 )
 
 type DarwiniaEventRecords struct {
-	types.EventRecords
+	base.BaseEventRecords
 	Kton_Endowed                                    []EventKtonEndowed
 	Kton_DustLost                                   []EventKtonDustLost
 	Kton_Transfer                                   []EventKtonTransfer
