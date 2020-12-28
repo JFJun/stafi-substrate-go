@@ -6,19 +6,22 @@ import (
 	"github.com/stafiprotocol/go-substrate-rpc-client/types"
 )
 
-func NewCall(callIdx string,args ...interface{})(types.Call,error){
-	if len(callIdx)!=4 {
-		return types.Call{},fmt.Errorf("callIdx length is not equal 4,len=%d",len(callIdx))
+/*
+扩展： 创建一个新的Call方法
+*/
+func NewCall(callIdx string, args ...interface{}) (types.Call, error) {
+	if len(callIdx) != 4 {
+		return types.Call{}, fmt.Errorf("callIdx length is not equal 4,len=%d", len(callIdx))
 	}
-	m,err:=hex.DecodeString(callIdx[:2])
+	m, err := hex.DecodeString(callIdx[:2])
 	if err != nil {
 		return types.Call{}, err
 	}
-	n,err:=hex.DecodeString(callIdx[2:])
+	n, err := hex.DecodeString(callIdx[2:])
 	if err != nil {
-		return types.Call{},err
+		return types.Call{}, err
 	}
-	c:=types.CallIndex{SectionIndex: m[0],MethodIndex: n[0]}
+	c := types.CallIndex{SectionIndex: m[0], MethodIndex: n[0]}
 	var a []byte
 	for _, arg := range args {
 		e, err := types.EncodeToBytes(arg)

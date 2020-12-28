@@ -255,3 +255,110 @@ func (d *WeightToFeeCoefficient) Decode(decoder scale.Decoder) error {
 	}
 	return nil
 }
+
+/*
+https://github.com/polkadot-js/api/blob/0e52e8fe23ed029b8101cf8bf82deccd5aa7a790/packages/types/src/generic/MultiAddress.ts
+*/
+
+type MultiAddress struct {
+	GenericMultiAddress
+}
+type GenericMultiAddress struct {
+	AccountId types.AccountID
+	Index     types.UCompact
+	Raw       types.Bytes
+	Address32 types.H256
+	Address20 types.H160
+	types     int
+}
+
+func (d *GenericMultiAddress) Decode(decoder scale.Decoder) error {
+	b, err := decoder.ReadOneByte()
+	if err != nil {
+		return fmt.Errorf("generic MultiAddress read on bytes error: %v", err)
+	}
+	switch int(b) {
+	case 0:
+		err = decoder.Decode(&d.AccountId)
+	case 1:
+		err = decoder.Decode(&d.Index)
+	case 2:
+		err = decoder.Decode(&d.Address32)
+	case 3:
+		err = decoder.Decode(&d.Address20)
+	default:
+		err = fmt.Errorf("generic MultiAddress unsupport type=%d ", b)
+	}
+	if err != nil {
+		return err
+	}
+	d.types = int(b)
+	return nil
+}
+
+func (d GenericMultiAddress) Encode(encoder scale.Encoder) error {
+	t := types.NewU8(uint8(d.types))
+	err := encoder.Encode(t)
+	if err != nil {
+		return err
+	}
+	switch d.types {
+	case 0:
+		if &d.AccountId == nil {
+			err = fmt.Errorf("generic MultiAddress id is null:%v", d.AccountId)
+		}
+		err = encoder.Encode(d.AccountId)
+	case 1:
+		if &d.Index == nil {
+			err = fmt.Errorf("generic MultiAddress index is null:%v", d.Index)
+		}
+		err = encoder.Encode(d.Index)
+	case 2:
+		if &d.Address32 == nil {
+			err = fmt.Errorf("generic MultiAddress address32 is null:%v", d.Address32)
+		}
+		err = encoder.Encode(d.Address32)
+	case 3:
+		if &d.Address20 == nil {
+			err = fmt.Errorf("generic MultiAddress address20 is null:%v", d.Address20)
+		}
+		err = encoder.Encode(d.Address20)
+	default:
+		err = fmt.Errorf("generic MultiAddress unsupport this types: %d", d.types)
+	}
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+/*
+没办法，底层解析就是这样做的，只能这样写了，虽然很不友好
+*/
+func (d *GenericMultiAddress) GetTypes() int {
+	return d.types
+}
+func (d *GenericMultiAddress) SetTypes(types int) {
+	d.types = types
+}
+func (d *GenericMultiAddress) GetAccountId() types.AccountID {
+	return d.AccountId
+}
+func (d *GenericMultiAddress) GetIndex() types.UCompact {
+	return d.Index
+}
+func (d *GenericMultiAddress) GetAddress32() types.H256 {
+	return d.Address32
+}
+func (d *GenericMultiAddress) GetAddress20() types.H160 {
+	return d.Address20
+}
+
+func (d *GenericMultiAddress) ToAddress() types.Address {
+	if d.types != 0 {
+		return types.Address{}
+	}
+	var ai []byte
+	ai = append([]byte{0x00}, d.AccountId[:]...)
+	return types.NewAddressFromAccountID(ai)
+}

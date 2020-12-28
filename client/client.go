@@ -39,14 +39,17 @@ func New(url string) (*Client, error) {
 	c := new(Client)
 	c.url = url
 	var err error
+	//注册链的基本信息
 	c.BasicType, err = base.InitBasicTypesByHexData()
 	if err != nil {
 		return nil, fmt.Errorf("init base type error: %v", err)
 	}
+	// 初始化rpc客户端
 	c.C, err = gsrc.NewSubstrateAPI(url)
 	if err != nil {
 		return nil, err
 	}
+	//检查当前链运行的版本
 	err = c.checkRuntimeVersion()
 	if err != nil {
 		return nil, err
@@ -95,6 +98,7 @@ func (c *Client) checkRuntimeVersion() error {
 	c.TransactionVersion = int(v.TransactionVersion)
 	c.ChainName = v.SpecName
 	specVersion := int(v.SpecVersion)
+	//检查metadata数据是否有升级
 	if specVersion != c.SpecVersion {
 		c.Meta, err = c.C.RPC.State.GetMetadataLatest()
 		if err != nil {
@@ -105,6 +109,9 @@ func (c *Client) checkRuntimeVersion() error {
 	return nil
 }
 
+/*
+获取创世区块hash
+*/
 func (c *Client) GetGenesisHash() string {
 	if c.genesisHash != "" {
 		return c.genesisHash
@@ -123,6 +130,10 @@ func (c *Client) GetGenesisHash() string {
 func (c *Client) SetPrefix(prefix []byte) {
 	c.prefix = prefix
 }
+
+/*
+根据height解析block，返回block是否包含交易
+*/
 func (c *Client) GetBlockByNumber(height int64) (*models.BlockResponse, error) {
 	hash, err := c.C.RPC.Chain.GetBlockHash(uint64(height))
 	if err != nil {
@@ -133,6 +144,9 @@ func (c *Client) GetBlockByNumber(height int64) (*models.BlockResponse, error) {
 	return c.GetBlockByHash(blockHash)
 }
 
+/*
+根据blockHash解析block，返回block是否包含交易
+*/
 func (c *Client) GetBlockByHash(blockHash string) (*models.BlockResponse, error) {
 	var (
 		block *models.SignedBlock
@@ -171,6 +185,9 @@ type parseBlockExtrinsicParams struct {
 	extrinsicIdx, length          int
 }
 
+/*
+解析外部交易extrinsic
+*/
 func (c *Client) parseExtrinsicByDecode(extrinsics []string, blockResp *models.BlockResponse) error {
 	var (
 		params    []parseBlockExtrinsicParams
@@ -312,6 +329,9 @@ func (c *Client) parseExtrinsicByDecode(extrinsics []string, blockResp *models.B
 	return nil
 }
 
+/*
+解析当前区块的System.event
+*/
 func (c *Client) parseExtrinsicByStorage(blockHash string, blockResp *models.BlockResponse) error {
 	var (
 		storage types.StorageKey
@@ -326,26 +346,26 @@ func (c *Client) parseExtrinsicByStorage(blockHash string, blockResp *models.Blo
 		//不包含交易就不处理了
 		return nil
 	}
+	// 1. 先创建System.event的storageKey
 	storage, err = types.CreateStorageKey(c.Meta, "System", "Events", nil, nil)
 	if err != nil {
 		return fmt.Errorf("create storage key error: %v", err)
 	}
 	key := storage.Hex()
 	var result interface{}
+	/*
+		根据storageKey以及blockHash获取当前区块的event信息
+	*/
 	err = c.C.Client.Call(&result, "state_getStorageAt", key, blockHash)
 	if err != nil {
 		return fmt.Errorf("get storage data error: %v", err)
 	}
+	//解析event信息
 	ier, err := expand.DecodeEventRecords(c.Meta, result.(string), c.ChainName)
 	if err != nil {
 		return fmt.Errorf("decode event data error: %v", err)
 	}
-	//e := types.EventRecordsRaw(types.MustHexDecodeString(result.(string)))
-	//var events types.EventRecords
-	//err = e.DecodeEventRecords(c.Meta, &events)
-	//if err != nil {
-	//	return fmt.Errorf("decode event data error: %v", err)
-	//}
+
 	var res []models.EventResult
 	failedMap := make(map[int]bool)
 	if len(ier.GetBalancesTransfer()) > 0 {
@@ -427,12 +447,18 @@ func (c *Client) parseExtrinsicByStorage(blockHash string, blockResp *models.Blo
 //	return fee.String()
 //}
 
+/*
+根据外部交易extrinsic创建txid
+*/
 func (c *Client) createTxHash(extrinsic string) string {
 	data, _ := hex.DecodeString(utils.RemoveHex0x(extrinsic))
 	d := blake2b.Sum256(data)
 	return "0x" + hex.EncodeToString(d[:])
 }
 
+/*
+根据地址获取地址的账户信息，包括nonce以及余额等
+*/
 func (c *Client) GetAccountInfo(address string) (*types.AccountInfo, error) {
 	var (
 		storage types.StorageKey
@@ -465,6 +491,9 @@ func (c *Client) GetAccountInfo(address string) (*types.AccountInfo, error) {
 	return &accountInfo, nil
 }
 
+/*
+获取外部交易extrinsic的手续费
+*/
 func (c *Client) GetPartialFee(extrinsic, parentHash string) (string, error) {
 	if !strings.HasPrefix(extrinsic, "0x") {
 		extrinsic = "0x" + extrinsic
@@ -474,6 +503,7 @@ func (c *Client) GetPartialFee(extrinsic, parentHash string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("get payment info error: %v", err)
 	}
+
 	if result["partialFee"] == nil {
 		return "", errors.New("result partialFee is nil ptr")
 	}

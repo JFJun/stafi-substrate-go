@@ -1,5 +1,10 @@
 package expand
 
+/*
+扩展：解析extrinsic
+	substrate2.0的extrinsic都是这样，所以这里的变动其实很小
+	这里编写都是为了与github.com/JFJun/substrate-go保持一制，所以会显得有点混乱
+*/
 import (
 	"fmt"
 	"github.com/JFJun/stafi-substrate-go/utils"
@@ -197,17 +202,20 @@ func (ed *ExtrinsicDecoder) decodeCallIndex(decoder scale.Decoder) error {
 	case "Balances":
 		if callName == "transfer" || callName == "transfer_keep_alive" {
 			// 0 ---> 	Address
+			var addrValue string
 			var address Address
 			err = decoder.Decode(&address)
 			if err != nil {
 				return fmt.Errorf("decode call: decode Balances.transfer.Address error: %v", err)
 			}
+			addrValue = address.Value
+
 			ed.Params = append(ed.Params,
 				ExtrinsicParam{
 					Name:     "dest",
 					Type:     "Address",
-					Value:    address.Value,
-					ValueRaw: address.Value,
+					Value:    addrValue,
+					ValueRaw: addrValue,
 				})
 			// 1 ----> Compact<Balance>
 			var b types.UCompact
@@ -273,3 +281,5 @@ func (ed *ExtrinsicDecoder) decodeCallIndex(decoder scale.Decoder) error {
 	}
 	return nil
 }
+
+//----------support for bifrost

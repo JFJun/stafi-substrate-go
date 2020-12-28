@@ -32,6 +32,9 @@ type Transaction struct {
 	SystemRemarkCallId string `json:"system_remark_call_id"` //通过System.remark去携带memo信息
 }
 
+/*
+创建一笔Balances.transfer或者Balances.transfe_keep_alive交易
+*/
 func CreateTransaction(from, to string, amount, nonce uint64) *Transaction {
 	return &Transaction{
 		SenderPubkey:    utils.AddressToPublicKey(from),
@@ -41,6 +44,9 @@ func CreateTransaction(from, to string, amount, nonce uint64) *Transaction {
 	}
 }
 
+/*
+创建一笔Utility.batch交易
+*/
 func CreateUtilityBatchTransaction(from string, nonce uint64, address_amount map[string]uint64, utilityBatchCallId string) *Transaction {
 	tx := new(Transaction)
 	tx.SenderPubkey = utils.AddressToPublicKey(from)
@@ -54,6 +60,10 @@ func CreateUtilityBatchTransaction(from string, nonce uint64, address_amount map
 	return tx
 }
 
+/*
+创建一笔带memo的交易
+主要思想是在Utility.batch中，添加一个balance.transfer的call方法和一个System.remark的call方法
+*/
 func CreateTransactionWithMemo(from, to, memo string, amount, nonce uint64, utilityBatchCallId, systemRemarkCallId string) *Transaction {
 	return &Transaction{
 		SenderPubkey:       utils.AddressToPublicKey(from),
@@ -66,12 +76,18 @@ func CreateTransactionWithMemo(from, to, memo string, amount, nonce uint64, util
 	}
 }
 
+/*
+设置交易的必要参数genesisHash和blockHash
+*/
 func (tx *Transaction) SetGenesisHashAndBlockHash(genesisHash, blockHash string) *Transaction {
 	tx.GenesisHash = utils.Remove0X(genesisHash)
 	tx.BlockHash = utils.Remove0X(blockHash)
 	return tx
 }
 
+/*
+设置链的版本以及交易版本还有Balance.transfer或者Balance.transfer_keep_alive的callIdx
+*/
 func (tx *Transaction) SetSpecVersionAndCallId(specVersion, transactionVersion uint32, callIdx string) *Transaction {
 	tx.SpecVersion = specVersion
 	tx.TransactionVersion = transactionVersion
@@ -128,7 +144,8 @@ func (tx *Transaction) checkTxParams() error {
 }
 
 /*
-signType: 0-->ed25519   1--> sr25519		2--> ecdsa
+signType: 0-->ecdsa   1--> sr25519		2--> ed25519
+目前暂不支持ecdsa
 */
 func (tx *Transaction) SignTransaction(privateKey string, signType int) (string, error) {
 	var (
@@ -253,6 +270,8 @@ func (tx *Transaction) signTx(e *types.Extrinsic, o types.SignatureOptions, priv
 		ss = types.MultiSignature{IsEd25519: true, AsEd25519: types.NewSignature(sig)}
 	} else if signType == crypto.Sr25519Type {
 		ss = types.MultiSignature{IsSr25519: true, AsSr25519: types.NewSignature(sig)}
+	} else if signType == crypto.EcdsaType {
+		ss = types.MultiSignature{IsEcdsa: true, AsEcdsa: types.NewBytes(sig)}
 	} else {
 		return fmt.Errorf("unsupport sign type : %d", signType)
 	}

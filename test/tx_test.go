@@ -13,12 +13,11 @@ import (
 )
 
 func Test_tx(t *testing.T) {
+	from := "eYGvmRP1fu418SSaypzN84S58YCm9c8SST9V2NriPbEMPP9"
+	to := "gA7aiTz144UvgFtPEboN6JjoQgGGUiuM9Wx3NRzETw6gCW6"
 
-	from := "5DkswVFmWPUwPkmqMUEvavvso2HMdiyY71ixA2e52Ynwzvtg"
-	to := "5H4N5JZHuqkprDKSR9SJeTMivbQQ94WrxeFELxh45ACoZFQC"
-
-	amount := uint64(1234567890000)
-	c, err := client.New("wss://node-6714447553211260928.rz.onfinality.io/ws")
+	amount := uint64(50000000000000)
+	c, err := client.New("wss://testnet.liebi.com")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -32,8 +31,11 @@ func Test_tx(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	c.SetPrefix(ss58.BifrostPrefix)
 	nonce := uint64(acc.Nonce)
-	//types.SetSerDeOptions(types.SerDeOptions{NoPalletIndices: true})
+	fmt.Println(nonce)
+	fmt.Println(c.GetGenesisHash())
+	types.SetSerDeOptions(types.SerDeOptions{NoPalletIndices: true})
 	transaction := tx.CreateTransaction(from, to, amount, nonce)
 	transaction.SetGenesisHashAndBlockHash(c.GetGenesisHash(),
 		c.GetGenesisHash())
@@ -45,8 +47,9 @@ func Test_tx(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	fmt.Println(btCall)
 	transaction.SetSpecVersionAndCallId(uint32(v.SpecVersion), uint32(v.TransactionVersion), btCall)
-	tt, err := transaction.SignTransaction("", crypto.Sr25519Type)
+	tt, err := transaction.SignTransaction("0f0a035d35bc540a7bf51889b03fe0a89f3536038222536b39a2bd91233a22bc", crypto.Sr25519Type)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -147,15 +150,15 @@ func Test_TxWithMemo(t *testing.T) {
 }
 
 func Test_FakeDeposit(t *testing.T) {
-	from := "32qwhN8jf2nqa8nh6rjLhbfJ8kRjb1TgYFeLQyvRT8yPcNFr"
-	to := "3441UQVQ9W172grCEXCKo66faJcxPMbnDTTvFxUwD2x3LtiY"
+	from := "5RHGBggpMDvQ9HtjjFpK7oETuc51DAj4QcATk6HH2dswNZ98"
+	to := "5U2RLJHbQ1VQJ1bLACxYMtxSQVxRPqfp34WAUxfb5zpUEwaQ"
 	nonce := uint64(15)
 	amount := uint64(123456)
-	c, err := client.New("wss://rpc.polkadot.io")
+	c, err := client.New("")
 	if err != nil {
 		t.Fatal(err)
 	}
-	c.SetPrefix(ss58.StafiPrefix)
+	c.SetPrefix(ss58.ChainXPrefix)
 	v, err := c.C.RPC.State.GetRuntimeVersionLatest()
 	if err != nil {
 		t.Fatal(err)
@@ -170,17 +173,17 @@ func Test_FakeDeposit(t *testing.T) {
 	}
 	for i := 0; i < 2; i++ {
 		if i == 0 {
-			nonce = 13
-			amount = 1000000000000
+			nonce = 5
+			amount = 1000000
 		} else {
-			nonce = 14
-			amount = 2000000000000
+			nonce = 6
+			amount = 7000000
 		}
 		transaction := tx.CreateTransaction(from, to, amount, nonce)
 		transaction.SetGenesisHashAndBlockHash(c.GetGenesisHash(),
 			c.GetGenesisHash())
 		transaction.SetSpecVersionAndCallId(uint32(v.SpecVersion), uint32(v.TransactionVersion), callIdx)
-		tt, err := transaction.SignTransaction("0000", crypto.Sr25519Type)
+		tt, err := transaction.SignTransaction("", crypto.Sr25519Type)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -198,3 +201,12 @@ func Test_FakeDeposit(t *testing.T) {
 
 // 0x350284ff4adffe0994aac9e292470b27eac94e505532ac1a22ae17012ddad445e6b78019018638639fb20aab85c72d5078439e6534a7b49039c4499ecb7d416d08792e7a4dbc4bc60db33a4681303a728ab3370a9e0d960ef4f60feef7c1eb391fc3538084003c001700ffdcea9317bceb28b52bdae9229a3794de4ca85e36d990a78f779c6fd7f27eb54102890700
 // 0x350284ff4adffe0994aac9e292470b27eac94e505532ac1a22ae17012ddad445e6b78019019c7d33500b6cf5bf2da5291c948d1a333766155b570e745a31647f589bafa50b8f62048ec7d4196f1242482944e5f64d0f829d0a2ffbfa7e9f308eacc44a538d003c001700ffdcea9317bceb28b52bdae9229a3794de4ca85e36d990a78f779c6fd7f27eb54102890700
+
+// 0x 2d02 84 8ce4f854296af0a2fa35faaf6f6577fb46d63d833d1a24a219d604506d151328 01
+//			  da7245068281d7bd5e1e3db63b3b1d8c43664f5393687f663d7d80c9515f590f
+//			  af5dd9be85eaebb83de8cbb53d368a77e7bd3b0a139602ddafaf0e1736e4038d
+//			  000c000500c4b1c12fd91e7c199b4a3da3a3adee7bfd97f35dee81d58a670de7b294a7fa7402890700
+// 0x 2d02 84 8ce4f854296af0a2fa35faaf6f6577fb46d63d833d1a24a219d604506d151328 01
+//			  288e08acd89507664ca4cd2684157921a7a3df810e9bbda30669edb63d7bcc79
+//			  505d4e87b5d525cb0b8f1c497b0fb9aa36776ee9fc1315188119f309a821cb8f
+//			  000c000500c4b1c12fd91e7c199b4a3da3a3adee7bfd97f35dee81d58a670de7b294a7fa7402890700
