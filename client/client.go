@@ -11,7 +11,6 @@ import (
 	"github.com/JFJun/stafi-substrate-go/expand"
 	"github.com/JFJun/stafi-substrate-go/models"
 	"github.com/JFJun/stafi-substrate-go/utils"
-	"github.com/shopspring/decimal"
 	gsrc "github.com/stafiprotocol/go-substrate-rpc-client"
 	gsClient "github.com/stafiprotocol/go-substrate-rpc-client/client"
 	"github.com/stafiprotocol/go-substrate-rpc-client/rpc"
@@ -360,12 +359,14 @@ func (c *Client) parseExtrinsicByStorage(blockHash string, blockResp *models.Blo
 	if err != nil {
 		return fmt.Errorf("get storage data error: %v", err)
 	}
+	//fmt.Println(result.(string))
 	//解析event信息
 	ier, err := expand.DecodeEventRecords(c.Meta, result.(string), c.ChainName)
 	if err != nil {
 		return fmt.Errorf("decode event data error: %v", err)
 	}
-
+	//d,_:=json.Marshal(ier)
+	//fmt.Println(string(d))
 	var res []models.EventResult
 	failedMap := make(map[int]bool)
 	if len(ier.GetBalancesTransfer()) > 0 {
@@ -396,7 +397,7 @@ func (c *Client) parseExtrinsicByStorage(blockHash string, blockResp *models.Blo
 				r.To = ""
 				continue
 			}
-			r.Amount = decimal.NewFromInt(ebt.Value.Int64()).String()
+			r.Amount = ebt.Value.String()
 			//r.Weight = c.getWeight(&events, r.ExtrinsicIdx)
 			res = append(res, r)
 		}
