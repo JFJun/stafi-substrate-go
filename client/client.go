@@ -59,6 +59,8 @@ func New(url string) (*Client, error) {
 	if len(c.prefix) == 0 {
 		c.prefix, _ = c.BasicType.GetChainPrefix(c.ChainName)
 	}
+	//设置默认地址不需要0xff
+	expand.SetSerDeOptions(true)
 	return c, nil
 }
 
@@ -318,7 +320,6 @@ func (c *Client) parseExtrinsicByDecode(extrinsics []string, blockResp *models.B
 		e.Era = param.era
 		e.Fee = param.fee
 		e.ExtrinsicIndex = param.extrinsicIdx
-		//e.Txid = txid
 		e.Txid = param.txid
 		e.ExtrinsicLength = param.length
 		blockResp.Extrinsic[idx] = e
@@ -359,7 +360,6 @@ func (c *Client) parseExtrinsicByStorage(blockHash string, blockResp *models.Blo
 	if err != nil {
 		return fmt.Errorf("get storage data error: %v", err)
 	}
-	//fmt.Println(result.(string))
 	//解析event信息
 	ier, err := expand.DecodeEventRecords(c.Meta, result.(string), c.ChainName)
 	if err != nil {
@@ -378,7 +378,9 @@ func (c *Client) parseExtrinsicByStorage(blockHash string, blockResp *models.Blo
 				failedMap[int(extrinsicIdx)] = true
 			}
 		}
+
 		for _, ebt := range ier.GetBalancesTransfer() {
+
 			if !ebt.Phase.IsApplyExtrinsic {
 				continue
 			}
@@ -392,6 +394,7 @@ func (c *Client) parseExtrinsicByStorage(blockHash string, blockResp *models.Blo
 				continue
 			}
 			toHex := hex.EncodeToString(ebt.To[:])
+
 			r.To, err = ss58.EncodeByPubHex(toHex, c.prefix)
 			if err != nil {
 				r.To = ""
@@ -419,8 +422,6 @@ func (c *Client) parseExtrinsicByStorage(blockHash string, blockResp *models.Blo
 						e.ToAddress = r.To
 						//计算手续费
 						//e.Fee = c.calcFee(&events, e.ExtrinsicIndex)
-					} else {
-						e.Status = fmt.Sprintf("to address is not equal,a1=[%s],a2=[%s]", e.ToAddress, r.To)
 					}
 				}
 			}

@@ -184,7 +184,7 @@ func (a *Address) Decode(decoder scale.Decoder) error {
 		return fmt.Errorf("decode address: get account length error: %v", err)
 	}
 	a.AccountLength = utils.BytesToHex([]byte{al})
-	if a.AccountLength == "ff" {
+	if a.AccountLength == "ff" && defaultSerDeOptions.SerDe.NoPalletIndices == false {
 		data := make([]byte, 32)
 		err = decoder.Read(data)
 		if err != nil {
