@@ -120,8 +120,7 @@ func CheckIsImplementedAllEvent(meta *types.Metadata, eventRecordType reflect.Ty
 func GetAllImplementedEventList(tp reflect.Type) []string {
 	eventList := []string{}
 
-	tpObj := reflect.TypeOf(dot.DotEventRecords{})
-	_GetEventDetail(tpObj, &eventList)
+	_GetEventDetail(tp, &eventList)
 
 	return eventList
 }
