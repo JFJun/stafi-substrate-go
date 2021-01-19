@@ -70,7 +70,7 @@ func DecodeEventRecords(meta *types.Metadata, rawData string, chainName string) 
 			return nil, err
 		}
 		ier = &events
-	case "polkadot", "ksm":
+	case "polkadot", "kusama":
 		var events dot.DotEventRecords
 		err := e.DecodeEventRecords(meta, &events)
 		if err != nil {
@@ -88,6 +88,9 @@ func DecodeEventRecords(meta *types.Metadata, rawData string, chainName string) 
 	return ier, nil
 }
 
+/*
+	func:检查指定结构是否实现了Meta中的所有Event
+*/
 func CheckIsImplementedAllEvent(meta *types.Metadata, eventRecordType reflect.Type) (noImplementedEvent []string, isAllImplemented bool) {
 	eventList := GetAllImplementedEventList(eventRecordType)
 	existFunc := func(eventName string) bool {
