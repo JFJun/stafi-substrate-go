@@ -110,7 +110,7 @@ func CheckIsImplementedAllEvent(meta *types.Metadata, eventRecordType reflect.Ty
 		}
 	}
 
-	isAllImplemented = len(noImplementedEvent) > 0
+	isAllImplemented = len(noImplementedEvent) <= 0
 	return
 }
 
