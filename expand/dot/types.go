@@ -3,39 +3,14 @@ package dot
 import (
 	"encoding/hex"
 	"fmt"
+	"github.com/JFJun/stafi-substrate-go/expand/base"
 	"github.com/stafiprotocol/go-substrate-rpc-client/scale"
 	"github.com/stafiprotocol/go-substrate-rpc-client/types"
 )
 
 type DotEventRecords struct {
-	types.EventRecords
-	Treasury_BountyProposed     []EventTreasuryBountyProposed
-	Treasury_BountyRejected     []EventTreasuryBountyRejected
-	Treasury_BountyBecameActive []EventTreasuryBountyBecameActive
-	Treasury_BountyAwarded      []EventTreasuryBountyAwarded
-	Treasury_BountyClaimed      []EventTreasuryBountyClaimed
-	Treasury_BountyCanceled     []EventTreasuryBountyCanceled
-	Treasury_BountyExtended     []EventTreasuryBountyExtended
-	TechnicalMembership_Dummy   []EventTechnicalMembershipDummy
-
-	Currencies_Transferred    []EventCurrenciesTransferred
-	Currencies_BalanceUpdated []EventCurrenciesBalanceUpdated
-	Currencies_Deposited      []EventCurrenciesDeposited
-	Currencies_Withdrawn      []EventCurrenciesWithdrawn
-
-	Vesting_VestingScheduleAdded    []EventVestingVestingScheduleAdded
-	Vesting_Claimed                 []EventVestingClaimed
-	Vesting_VestingSchedulesUpdated []EventVestingVestingSchedulesUpdated
-
-	Multisig_NewMultisig       []types.EventMultisigNewMultisig
-	Multisig_MultisigApproval  []types.EventMultisigApproval
-	Multisig_MultisigExecuted  []types.EventMultisigExecuted
-	Multisig_MultisigCancelled []types.EventMultisigCancelled
-
-	Balances_ReserveRepatriated []EventBalancesReserveRepatriated
-	Proxy_Announced             []EventProxyAnnounced
-	Claims_Claimed              []EventClaimsClaimed //nolint:stylecheck,golint
-
+	base.BaseEventRecords
+	Claims_Claimed []EventClaimsClaimed //nolint:stylecheck,golint
 }
 
 func (d *DotEventRecords) GetBalancesTransfer() []types.EventBalancesTransfer {
@@ -171,7 +146,7 @@ type EventProxyAnnounced struct {
 type EventClaimsClaimed struct {
 	Phase           types.Phase
 	AccountId       types.AccountID
-	EthereumAddress [20]byte
+	EthereumAddress types.H160
 	Balance         types.U128
 	Topics          []types.Hash
 }
