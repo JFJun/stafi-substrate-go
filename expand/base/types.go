@@ -283,3 +283,5 @@ func (d *Log) Decode(decoder scale.Decoder) error {
 https://github.com/polkadot-js/api/blob/master/packages/types/src/interfaces/collective/types.ts
 */
 type MemberCount types.U32
+
+type Perbill types.U32

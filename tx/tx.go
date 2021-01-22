@@ -19,7 +19,7 @@ type Transaction struct {
 	Nonce              uint64            `json:"nonce"`            //nonce值
 	Tip                uint64            `json:"tip"`              //小费
 	BlockNumber        uint64            `json:"block_Number"`     //最新区块高度
-	EraPeriod          uint64            `json:"era_period"`       // 存活最大区块
+	EraPeriod          uint64            `json:"era_period"`       // 存活最大区块	//default set 64
 	BlockHash          string            `json:"block_hash"`       //最新区块hash
 	GenesisHash        string            `json:"genesis_hash"`     //
 	SpecVersion        uint32            `json:"spec_version"`
@@ -33,7 +33,7 @@ type Transaction struct {
 }
 
 /*
-创建一笔Balances.transfer或者Balances.transfe_keep_alive交易
+创建一笔Balances.transfer或者Balances.transfer_keep_alive交易
 */
 func CreateTransaction(from, to string, amount, nonce uint64) *Transaction {
 	return &Transaction{
