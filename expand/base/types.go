@@ -34,16 +34,6 @@ type BaseEventRecords struct {
 
 	Balances_ReserveRepatriated []EventBalancesReserveRepatriated
 	Proxy_Announced             []EventProxyAnnounced
-
-	Democracy_Blacklisted []EventDemocracyBlacklisted //nolint:stylecheck,golint
-
-	// 投票相关
-	ElectionsPhragmen_NewTerm         []EventElectionsPhragmenNewTerm         //nolint:stylecheck,golint
-	ElectionsPhragmen_EmptyTerm       []EventElectionsPhragmenEmptyTerm       //nolint:stylecheck,golint
-	ElectionsPhragmen_ElectionError   []EventElectionsPhragmenElectionError   //nolint:stylecheck,golint
-	ElectionsPhragmen_MemberKicked    []EventElectionsPhragmenMemberKicked    //nolint:stylecheck,golint
-	ElectionsPhragmen_MemberRenounced []EventElectionsPhragmenMemberRenounced //nolint:stylecheck,golint
-	ElectionsPhragmen_VoterReported   []EventElectionsPhragmenVoterReported   //nolint:stylecheck,golint
 }
 
 func (d *BaseEventRecords) GetBalancesTransfer() []types.EventBalancesTransfer {
@@ -177,46 +167,6 @@ type EventProxyAnnounced struct {
 	Topics []types.Hash
 }
 
-//  A proposal hash has been blacklisted permanently.
-type EventDemocracyBlacklisted struct {
-	Phase               types.Phase
-	BlacklistedProposal types.Hash
-	Topics              []types.Hash
-}
-type EventElectionsPhragmenNewTerm struct {
-	Phase   types.Phase
-	NewTerm []PhragmenNewTermItem
-	Topics  []types.Hash
-}
-
-type EventElectionsPhragmenEmptyTerm struct {
-	Phase  types.Phase
-	Topics []types.Hash
-}
-
-type EventElectionsPhragmenElectionError struct {
-	Phase  types.Phase
-	Topics []types.Hash
-}
-
-type EventElectionsPhragmenMemberKicked struct {
-	Phase     types.Phase
-	AccountId types.AccountID
-	Topics    []types.Hash
-}
-type EventElectionsPhragmenMemberRenounced struct {
-	Phase     types.Phase
-	AccountId types.AccountID
-	Topics    []types.Hash
-}
-type EventElectionsPhragmenVoterReported struct {
-	Phase      types.Phase
-	AccountId1 types.AccountID
-	AccountId2 types.AccountID
-	IsSuccess  types.Bool
-	Topics     []types.Hash
-}
-
 type CurrencyId types.U32
 
 /*
@@ -334,20 +284,4 @@ https://github.com/polkadot-js/api/blob/master/packages/types/src/interfaces/col
 */
 type MemberCount types.U32
 
-type PhragmenNewTermItem struct {
-	AccountId types.AccountID
-	Balance   types.U128
-}
-
-func (d *PhragmenNewTermItem) Decode(decoder scale.Decoder) error {
-	err := decoder.Decode(&d.AccountId)
-	if err != nil {
-		return err
-	}
-	err = decoder.Decode(&d.Balance)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
+type Perbill types.U32

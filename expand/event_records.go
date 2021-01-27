@@ -7,8 +7,8 @@ import (
 	"github.com/JFJun/stafi-substrate-go/expand/chainX"
 	"github.com/JFJun/stafi-substrate-go/expand/crust"
 	"github.com/JFJun/stafi-substrate-go/expand/darwinia"
-	"github.com/JFJun/stafi-substrate-go/expand/dot"
 	"github.com/JFJun/stafi-substrate-go/expand/ori"
+	"github.com/JFJun/stafi-substrate-go/expand/polkadot"
 	"github.com/JFJun/stafi-substrate-go/expand/stafi"
 	"github.com/stafiprotocol/go-substrate-rpc-client/types"
 	"reflect"
@@ -70,8 +70,17 @@ func DecodeEventRecords(meta *types.Metadata, rawData string, chainName string) 
 			return nil, err
 		}
 		ier = &events
+		/*
+			case "polkadot", "kusama":
+				var events dot.DotEventRecords
+				err := e.DecodeEventRecords(meta, &events)
+				if err != nil {
+					return nil, err
+				}
+				ier = &events
+		*/
 	case "polkadot", "kusama":
-		var events dot.DotEventRecords
+		var events polkadot.PolkadotEventRecords
 		err := e.DecodeEventRecords(meta, &events)
 		if err != nil {
 			return nil, err

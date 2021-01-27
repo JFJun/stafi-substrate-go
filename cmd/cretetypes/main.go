@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	url := "http://fis.rylink.io:31833"
+	url := ""
 	err := createTypes("fis", url)
 	if err != nil {
 		panic(err)

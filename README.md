@@ -4,6 +4,8 @@
         目前该包支持以下币种：
             stafi(FIS),polkadot(DOT),kusama(KSM),chainX2.0(PCX),darwinia(CRING,RING)
     2. 这个包其实是对github.com/JFJun/substrate-go包的升级，所以功能与两者相似，只不过这个包更简洁更稳定。
+    3. 发送交易建议使用新的方法，功能都是一样，进行了简单的封装，相对之前看着更加简洁，可以查看相应的测试方法：
+        https://github.com/JFJun/stafi-substrate-go/test/tx2_test.go
 ## 使用
 ### 1. 解析区块
         // 初始化客户端
@@ -11,7 +13,7 @@
     	if err != nil {
     		t.Fatal(err)
     	}
-    	//types.SetSerDeOptions(types.SerDeOptions{NoPalletIndices: true})
+    	//expand.SetSerDeOptions(false)
     	// 设置地址的前缀，默认是 0x2a
     	c.SetPrefix(ss58.StafiPrefix)
     	resp, err := c.GetBlockByNumber(2517230)
@@ -29,7 +31,7 @@
     }
     //2. 下面这句代码因为每个链的不同而不同，我看源代码是因为一个Indices这个module的有无决定的
     //  反正如果提交交易包含 MultiSignature错误什么的，就把 这个bool值设置为相反就行了
-    types.SetSerDeOptions(types.SerDeOptions{NoPalletIndices: true})
+    expand.SetSerDeOptions(false)
     //3. 设置链的前缀
     c.SetPrefix(ss58.StafiPrefix)
     //4。 创建交易
