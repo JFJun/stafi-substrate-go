@@ -35,6 +35,10 @@ type Client struct {
 }
 
 func New(url string) (*Client, error) {
+	return New2(url, true)
+}
+
+func New2(url string, noPalletIndices bool) (*Client, error) {
 	c := new(Client)
 	c.url = url
 	var err error
@@ -60,7 +64,7 @@ func New(url string) (*Client, error) {
 		c.prefix, _ = c.BasicType.GetChainPrefix(c.ChainName)
 	}
 	//设置默认地址不需要0xff
-	expand.SetSerDeOptions(true)
+	expand.SetSerDeOptions(noPalletIndices)
 	return c, nil
 }
 
