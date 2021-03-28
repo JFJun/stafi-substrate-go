@@ -7,7 +7,7 @@ import (
 )
 
 func Test_Chain(t *testing.T) {
-	c, err := client.New("wss://mainnet-rpc.stafi.io")
+	c, err := client.New("http://ksm.rylink.io:30933")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -20,7 +20,12 @@ func Test_Chain(t *testing.T) {
 					continue
 				}
 				fmt.Printf("%s		[]Event%s%s\n", typeName, mod.Name, event.Name)
-				fmt.Printf("type Event%s%s struct { \n	Phase    types.Phase\n	%v\n	Topics []types.Hash\n}\n", mod.Name, event.Name, event.Args)
+				if len(event.Args) == 0 {
+					fmt.Printf("type Event%s%s struct { \n	Phase    types.Phase\n	\n	Topics []types.Hash\n}\n", mod.Name, event.Name)
+				} else {
+					fmt.Printf("type Event%s%s struct { \n	Phase    types.Phase\n	%v\n	Topics []types.Hash\n}\n", mod.Name, event.Name, event.Args)
+				}
+
 				//fmt.Println(event.Args)
 				fmt.Println("------------------------------------------------")
 			}

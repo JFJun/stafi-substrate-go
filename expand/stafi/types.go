@@ -40,6 +40,15 @@ type StafiEventRecords struct {
 	BridgeCommon_ProposalPassed          []EventBridgeCommonProposalPassed
 	BridgeCommon_ProposalCancelled       []EventBridgeCommonProposalCancelled
 	BridgeCommon_ProposalExecuted        []EventBridgeCommonProposalExecuted
+	RFis_ValidatorPaidout                []EventRFisValidatorPaidout
+}
+type EventRFisValidatorPaidout struct {
+	Phase      types.Phase
+	EraIndex   EraIndex
+	AccountId1 types.AccountID
+	AccountId2 types.AccountID
+	Bool       types.Bool
+	Topics     []types.Hash
 }
 type EventBridgeCommonProposalExecuted struct {
 	Phase        types.Phase

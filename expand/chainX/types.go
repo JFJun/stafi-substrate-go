@@ -18,6 +18,7 @@ type ChainXEventRecords struct {
 	XAssets_Issued                              []EventXAssetsIssued
 	XAssets_Destroyed                           []EventXAssetsDestroyed
 	XAssets_SetBalance                          []EventXAssetsSetBalance
+	XAssets_BalanceSet                          []EventXAssetsBalanceSet
 	XAssets_SetRestrictions                     []EventXAssetsSetRestrictions
 	XStaking_Minted                             []EventXStakingMinted
 	XStaking_Slashed                            []EventXStakingSlashed
@@ -27,7 +28,9 @@ type ChainXEventRecords struct {
 	XStaking_Claimed                            []EventXStakingClaimed
 	XStaking_Withdrawn                          []EventXStakingWithdrawn
 	XStaking_ForceChilled                       []EventXStakingForceChilled
+	XStaking_ForceAllWithdrawn                  []EventXStakingForceAllWithdrawn
 	XMiningAsset_Claimed                        []EventXMiningAssetClaimed
+	XMiningAsset_Minted                         []EventXMiningAssetMinted
 	XGatewayRecords_Deposited                   []EventXGatewayRecordsDeposited
 	XGatewayRecords_WithdrawalCreated           []EventXGatewayRecordsWithdrawalCreated
 	XGatewayRecords_WithdrawalProcessed         []EventXGatewayRecordsWithdrawalProcessed
@@ -61,6 +64,37 @@ type ChainXEventRecords struct {
 	Currencies_Deposited                        []EventCurrenciesDeposited
 	Currencies_Withdrawn                        []EventCurrenciesWithdrawn
 	XTransactionFee_FeePaid                     []EventXTransactionFeeFeePaid
+	Democracy_Blacklisted                       []EventDemocracyBlacklisted
+	Elections_ElectionError                     []EventElectionsElectionError
+}
+
+type EventXMiningAssetMinted struct {
+	Phase     types.Phase
+	AccountId types.AccountID
+	Balance   types.U128
+	Topics    []types.Hash
+}
+type EventXStakingForceAllWithdrawn struct {
+	Phase     types.Phase
+	AccountId types.AccountID
+	Topics    []types.Hash
+}
+type EventXAssetsBalanceSet struct {
+	Phase     types.Phase
+	AssetId   AssetId
+	AccountId types.AccountID
+	AssetType AssetType
+	Balance   types.U128
+	Topics    []types.Hash
+}
+type EventElectionsElectionError struct {
+	Phase  types.Phase
+	Topics []types.Hash
+}
+type EventDemocracyBlacklisted struct {
+	Phase  types.Phase
+	Hash   types.Hash
+	Topics []types.Hash
 }
 
 func (d *ChainXEventRecords) GetBalancesTransfer() []types.EventBalancesTransfer {
