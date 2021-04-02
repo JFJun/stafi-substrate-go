@@ -19,6 +19,7 @@ type ChainXEventRecords struct {
 	XAssets_Issued                              []EventXAssetsIssued
 	XAssets_Destroyed                           []EventXAssetsDestroyed
 	XAssets_SetBalance                          []EventXAssetsSetBalance
+	XAssets_BalanceSet                          []EventXAssetsBalanceSet
 	XAssets_SetRestrictions                     []EventXAssetsSetRestrictions
 	XStaking_Minted                             []EventXStakingMinted
 	XStaking_Slashed                            []EventXStakingSlashed
@@ -28,7 +29,9 @@ type ChainXEventRecords struct {
 	XStaking_Claimed                            []EventXStakingClaimed
 	XStaking_Withdrawn                          []EventXStakingWithdrawn
 	XStaking_ForceChilled                       []EventXStakingForceChilled
+	XStaking_ForceAllWithdrawn                  []EventXStakingForceAllWithdrawn
 	XMiningAsset_Claimed                        []EventXMiningAssetClaimed
+	XMiningAsset_Minted                         []EventXMiningAssetMinted
 	XGatewayRecords_Deposited                   []EventXGatewayRecordsDeposited
 	XGatewayRecords_WithdrawalCreated           []EventXGatewayRecordsWithdrawalCreated
 	XGatewayRecords_WithdrawalProcessed         []EventXGatewayRecordsWithdrawalProcessed
@@ -62,9 +65,19 @@ type ChainXEventRecords struct {
 	Currencies_Deposited                        []EventCurrenciesDeposited
 	Currencies_Withdrawn                        []EventCurrenciesWithdrawn
 	XTransactionFee_FeePaid                     []EventXTransactionFeeFeePaid
-	XAssets_BalanceSet                          []EventXAssetsBalanceSet
-	XStaking_ForceAllWithdrawn                  []EventXStakingForceAllWithdrawn
-	XMiningAsset_Minted                         []EventXMiningAssetMinted
+
+	Democracy_Blacklisted                       []EventDemocracyBlacklisted
+	Elections_ElectionError                     []EventElectionsElectionError
+}
+
+type EventElectionsElectionError struct {
+	Phase  types.Phase
+	Topics []types.Hash
+}
+type EventDemocracyBlacklisted struct {
+	Phase  types.Phase
+	Hash   types.Hash
+	Topics []types.Hash
 }
 
 func (d *ChainXEventRecords) GetBalancesTransfer() []types.EventBalancesTransfer {

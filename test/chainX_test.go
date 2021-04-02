@@ -14,30 +14,30 @@ import (
 )
 
 func Test_Chain_GetBlockByNumber(t *testing.T) {
-	c, err := client.New("wss://node.v1.riochain.io/ws")
+	c, err := client.New("wss://rpc.polkadot.io")
 	if err != nil {
 		t.Fatal(err)
 	}
-	dd, _ := json.Marshal(c.Meta.AsMetadataV12.Modules)
-	fmt.Println(string(dd))
-	fmt.Println(c.ChainName)
-	//for _, mod := range c.Meta.AsMetadataV12.Modules {
-	//	if mod.HasEvents {
-	//		for _, event := range mod.Events {
-	//			fmt.Printf("%s_%s\n", mod.Name, event.Name)
-	//			fmt.Printf("type Event%s%s struct { \n	Phase    types.Phase\n	%v\n	Topics []Hash\n}\n",mod.Name,event.Name,event.Args)
-	//			//fmt.Println(event.Args)
-	//			fmt.Println("------------------------------------------------")
-	//		}
-	//	}
+	//dd, _ := json.Marshal(c.Meta.AsMetadataV12.Modules)
+	//fmt.Println(string(dd))
+	//fmt.Println(c.ChainName)
+	for _, mod := range c.Meta.AsMetadataV12.Modules {
+		if mod.HasEvents {
+			for _, event := range mod.Events {
+				fmt.Printf("%s_%s\n", mod.Name, event.Name)
+				fmt.Printf("type Event%s%s struct { \n	Phase    types.Phase\n	%v\n	Topics []Hash\n}\n", mod.Name, event.Name, event.Args)
+				//fmt.Println(event.Args)
+				fmt.Println("------------------------------------------------")
+			}
+		}
+	}
+	//c.SetPrefix(ss58.SubstratePrefix)
+	//block, err := c.GetBlockByNumber(60165)
+	//if err != nil {
+	//	t.Fatal(err)
 	//}
-	c.SetPrefix(ss58.SubstratePrefix)
-	block, err := c.GetBlockByNumber(60165)
-	if err != nil {
-		t.Fatal(err)
-	}
-	d, _ := json.Marshal(block)
-	fmt.Println(string(d))
+	//d, _ := json.Marshal(block)
+	//fmt.Println(string(d))
 }
 
 func Test_ChainXTX(t *testing.T) {

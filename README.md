@@ -1,8 +1,9 @@
 #   stafi go sdk
+    **************** 如果要使用(2021-02-23升级)polkadot，请使用https://github.com/JFJun/bifrost-go.git   ****************************
 ## 介绍
     1. 该包不仅可用于波卡系列的区块解析以及离线签名。
         目前该包支持以下币种：
-            stafi(FIS),polkadot(DOT),kusama(KSM),chainX2.0(PCX),darwinia(CRING,RING)
+            stafi(FIS),kusama(KSM),chainX2.0(PCX),darwinia(CRING,RING)
     2. 这个包其实是对github.com/JFJun/substrate-go包的升级，所以功能与两者相似，只不过这个包更简洁更稳定。
     3. 发送交易建议使用新的方法，功能都是一样，进行了简单的封装，相对之前看着更加简洁，可以查看相应的测试方法：
         https://github.com/JFJun/stafi-substrate-go/test/tx2_test.go

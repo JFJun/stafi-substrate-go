@@ -64,14 +64,14 @@ func Test_Zstring(t *testing.T) {
 }
 
 func Test_GetAccountInfo(t *testing.T) {
-	c, err := client.New("wss://mainnet-rpc.stafi.io")
+	c, err := client.New("ws://fis.rylink.io:31844")
 	//c, err := client.New("wss://rpc.polkadot.io")
 	c.SetPrefix(ss58.StafiPrefix)
 	if err != nil {
 		t.Fatal(err)
 	}
 	//c.SetPrefix(ss58.StafiPrefix)
-	ai, err := c.GetAccountInfo("32qwhN8jf2nqa8nh6rjLhbfJ8kRjb1TgYFeLQyvRT8yPcNFr")
+	ai, err := c.GetAccountInfo("34R7rV86nwK478QbBWjvCrwdR6UVpBJuvbDwy7MDN328HaWs")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -108,13 +108,14 @@ func Test_GetAccountInfo(t *testing.T) {
 }
 
 func Test_GetBlockByNumber(t *testing.T) {
-	c, err := client.New("")
+	c, err := client.New("wss://mainnet.chainx.org/ws")
+	//c, err := client.New("")
 	if err != nil {
 		t.Fatal(err)
 	}
-	//types.SetSerDeOptions(types.SerDeOptions{NoPalletIndices: true})
-
-	resp, err := c.GetBlockByNumber(2802459)
+	c.SetPrefix(ss58.ChainXPrefix)
+	expand.SetSerDeOptions(false)
+	resp, err := c.GetBlockByNumber(1753086)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -145,7 +146,6 @@ func Test_CalcFee(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	var tbf types.U128
 	decoder := scale.NewDecoder(bytes.NewReader(value))
 	err = decoder.Decode(&tbf)
@@ -222,5 +222,34 @@ func Test_GetChainName(t *testing.T) {
 	fmt.Println(d.SpecName)
 }
 
+func Test_GetLatestBlock(t *testing.T) {
+
+}
+
 // 1700dcea9317bceb28b52bdae9229a3794de4ca85e36d990a78f779c6fd7f27eb54102890700003c001c0000000300000034f61bfda344b3fad3c3e38832a91448b3c613b199eb23e5110a635d71c13c6534f61bfda344b3fad3c3e38832a91448b3c613b199eb23e5110a635d71c13c65
 // 1700dcea9317bceb28b52bdae9229a3794de4ca85e36d990a78f779c6fd7f27eb54102890700003c001c0000000300000034f61bfda344b3fad3c3e38832a91448b3c613b199eb23e5110a635d71c13c6534f61bfda344b3fad3c3e38832a91448b3c613b199eb23e5110a635d71c13c65
+
+func Test_GetChainEvent(t *testing.T) {
+	c, err := client.New("wss://rpc.polkadot.io")
+	if err != nil {
+		t.Fatal(err)
+	}
+	//fmt.Println(c.ChainName)
+	//mod,_:=json.Marshal(c.Meta.AsMetadataV12.Modules)
+	//fmt.Println(string(mod))
+	for _, mod := range c.Meta.AsMetadataV12.Modules {
+		if mod.HasEvents {
+			for _, event := range mod.Events {
+				//typeName := fmt.Sprintf("%s_%s", mod.Name, event.Name)
+				//if IsExist(typeName) {
+				//	continue
+				//}
+
+				//fmt.Println(event.Name)
+				for _, arg := range event.Args {
+					fmt.Println(arg)
+				}
+			}
+		}
+	}
+}

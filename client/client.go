@@ -175,7 +175,8 @@ func (c *Client) GetBlockByHash(blockHash string) (*models.BlockResponse, error)
 		if err != nil {
 			return nil, err
 		}
-
+		d, _ := json.Marshal(blockResp)
+		fmt.Println(string(d))
 		err = c.parseExtrinsicByStorage(blockHash, blockResp)
 		if err != nil {
 			return nil, err
@@ -231,7 +232,6 @@ func (c *Client) parseExtrinsicByDecode(extrinsics []string, blockResp *models.B
 		if err != nil {
 			return fmt.Errorf("json unmarshal extrinsic decode error: %v", err)
 		}
-
 		switch resp.CallModule {
 		case "Timestamp":
 			for _, param := range resp.Params {
@@ -264,9 +264,9 @@ func (c *Client) parseExtrinsicByDecode(extrinsics []string, blockResp *models.B
 			if resp.CallModuleFunction == "batch" {
 				for _, param := range resp.Params {
 					if param.Name == "calls" {
+
 						switch param.Value.(type) {
 						case []interface{}:
-
 							d, _ := json.Marshal(param.Value)
 							var values []models.UtilityParamsValue
 							err = json.Unmarshal(d, &values)
@@ -276,6 +276,7 @@ func (c *Client) parseExtrinsicByDecode(extrinsics []string, blockResp *models.B
 
 							for _, value := range values {
 								if value.CallModule == "Balances" {
+
 									if value.CallFunction == "transfer" || value.CallFunction == "transfer_keep_alive" {
 										if len(value.CallArgs) > 0 {
 											for _, arg := range value.CallArgs {

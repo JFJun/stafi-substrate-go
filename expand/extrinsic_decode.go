@@ -137,6 +137,7 @@ func (ed *ExtrinsicDecoder) ProcessExtrinsicDecoder(decoder scale.Decoder) error
 	}
 	if ed.CallIndex != "" {
 		_ = ed.decodeCallIndex(decoder)
+		//fmt.Println(err)
 		//if err != nil {
 		//	return err
 		//}
@@ -233,18 +234,20 @@ func (ed *ExtrinsicDecoder) decodeCallIndex(decoder scale.Decoder) error {
 		}
 	case "Utility":
 		if callName == "batch" {
+
 			// 0--> calls   Vec<Call>
 			var tc TransferCall
 			vec := new(Vec)
-			err := vec.ProcessVec(decoder, tc)
-			if err != nil {
-				return fmt.Errorf("decode call: decode Utility.batch error: %v", err)
-			}
+			_ = vec.ProcessVec(decoder, tc)
+			//if err != nil {
+			//	return fmt.Errorf("decode call: decode Utility.batch error: %v", err)
+			//}
 			//utils.CheckStructData(vec.Value)
 			ep := ExtrinsicParam{}
 			ep.Name = "calls"
 			ep.Type = "Vec<Call>"
 			var result []interface{}
+
 			for _, value := range vec.Value {
 				tcv := value.(*TransferCall)
 				//检查一下是否为BalanceTransfer
