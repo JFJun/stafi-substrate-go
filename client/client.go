@@ -175,8 +175,8 @@ func (c *Client) GetBlockByHash(blockHash string) (*models.BlockResponse, error)
 		if err != nil {
 			return nil, err
 		}
-		d, _ := json.Marshal(blockResp)
-		fmt.Println(string(d))
+		//d, _ := json.Marshal(blockResp)
+		//fmt.Println(string(d))
 		err = c.parseExtrinsicByStorage(blockHash, blockResp)
 		if err != nil {
 			return nil, err
