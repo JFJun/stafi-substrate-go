@@ -315,8 +315,7 @@ func (tx *Transaction) getEra() *types.ExtrinsicEra {
 	era.AsMortalEra.Second = second
 	return era
 }
-
-func (tx Transaction) ReturnSign() (*types.Extrinsic, types.SignatureOptions, []byte, error) {
+func (tx Transaction) ReturnSign() (types.Call, types.SignatureOptions, []byte, error) {
 	var (
 		call types.Call
 		err  error
@@ -324,7 +323,7 @@ func (tx Transaction) ReturnSign() (*types.Extrinsic, types.SignatureOptions, []
 	//1. check params
 	err = tx.checkTxParams()
 	if err != nil {
-		return &types.Extrinsic{}, types.SignatureOptions{}, nil, fmt.Errorf("check params error: $v", err)
+		return types.Call{}, types.SignatureOptions{}, nil, fmt.Errorf("check params error: $v", err)
 	}
 	//2. create types.Call
 
@@ -340,11 +339,11 @@ func (tx Transaction) ReturnSign() (*types.Extrinsic, types.SignatureOptions, []
 			balanceTransferCall, err := expand.NewCall(tx.CallId, types.NewAddressFromAccountID(types.MustHexDecodeString(tx.RecipientPubkey)),
 				types.NewUCompactFromUInt(tx.Amount))
 			if err != nil {
-				return &types.Extrinsic{}, types.SignatureOptions{}, nil, fmt.Errorf("create utility.batch calls error: %v", err)
+				return types.Call{}, types.SignatureOptions{}, nil, fmt.Errorf("create utility.batch calls error: %v", err)
 			}
 			systemRemarkCall, err := expand.NewCall(tx.SystemRemarkCallId, tx.Memo)
 			if err != nil {
-				return &types.Extrinsic{}, types.SignatureOptions{}, nil, fmt.Errorf("create System.remark error: %v", err)
+				return types.Call{}, types.SignatureOptions{}, nil, fmt.Errorf("create System.remark error: %v", err)
 			}
 			//System.remark
 			args = append(args, balanceTransferCall)
@@ -354,7 +353,7 @@ func (tx Transaction) ReturnSign() (*types.Extrinsic, types.SignatureOptions, []
 				balanceTransferCall, err := expand.NewCall(tx.CallId, types.NewAddressFromAccountID(types.MustHexDecodeString(address)),
 					types.NewUCompactFromUInt(amount))
 				if err != nil {
-					return &types.Extrinsic{}, types.SignatureOptions{}, nil, fmt.Errorf("create utility.batch calls error: %v", err)
+					return types.Call{}, types.SignatureOptions{}, nil, fmt.Errorf("create utility.batch calls error: %v", err)
 				}
 				args = append(args, balanceTransferCall)
 			}
@@ -362,7 +361,7 @@ func (tx Transaction) ReturnSign() (*types.Extrinsic, types.SignatureOptions, []
 		call, err = expand.NewCall(tx.UtilityBatchCallId, args)
 	}
 	if err != nil {
-		return &types.Extrinsic{}, types.SignatureOptions{}, nil, fmt.Errorf("create types.Call error: %v", err)
+		return types.Call{}, types.SignatureOptions{}, nil, fmt.Errorf("create types.Call error: %v", err)
 	}
 	ext := types.NewExtrinsic(call)
 	o := types.SignatureOptions{
@@ -378,11 +377,11 @@ func (tx Transaction) ReturnSign() (*types.Extrinsic, types.SignatureOptions, []
 		o.Era = *era
 	}
 	if ext.Type() != types.ExtrinsicVersion4 {
-		return &ext, types.SignatureOptions{}, nil, fmt.Errorf("unsupported extrinsic version: %v (isSigned: %v, type: %v)", ext.Version, ext.IsSigned(), ext.Type())
+		return call, types.SignatureOptions{}, nil, fmt.Errorf("unsupported extrinsic version: %v (isSigned: %v, type: %v)", ext.Version, ext.IsSigned(), ext.Type())
 	}
 	mb, err := types.EncodeToBytes(ext.Method)
 	if err != nil {
-		return &ext, types.SignatureOptions{}, nil, err
+		return call, types.SignatureOptions{}, nil, err
 	}
 	eras := o.Era
 	if !o.Era.IsMortalEra {
@@ -403,12 +402,12 @@ func (tx Transaction) ReturnSign() (*types.Extrinsic, types.SignatureOptions, []
 	// sign
 	data, err := types.EncodeToBytes(payload)
 	if err != nil {
-		return &ext, types.SignatureOptions{}, nil, fmt.Errorf("encode payload error: %v", err)
+		return call, types.SignatureOptions{}, nil, fmt.Errorf("encode payload error: %v", err)
 	}
 	// if data is longer than 256 bytes, hash it first
 	if len(data) > 256 {
 		h := blake2b.Sum256(data)
 		data = h[:]
 	}
-	return &ext, o, data, nil
+	return call, o, data, nil
 }
