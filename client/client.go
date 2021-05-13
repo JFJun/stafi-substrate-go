@@ -189,6 +189,7 @@ type parseBlockExtrinsicParams struct {
 	from, to, sig, era, txid, fee string
 	nonce                         int64
 	extrinsicIdx, length          int
+	amount                        string
 }
 
 /*
@@ -253,8 +254,10 @@ func (c *Client) parseExtrinsicByDecode(extrinsics []string, blockResp *models.B
 				blockData.length = resp.Length
 				for _, param := range resp.Params {
 					if param.Name == "dest" {
-
 						blockData.to, _ = ss58.EncodeByPubHex(param.Value.(string), c.prefix)
+					}
+					if param.Name == "value" {
+						blockData.amount = param.Value.(string)
 					}
 				}
 				params = append(params, blockData)
@@ -322,6 +325,7 @@ func (c *Client) parseExtrinsicByDecode(extrinsics []string, blockResp *models.B
 		e.FromAddress = param.from
 		e.ToAddress = param.to
 		e.Nonce = param.nonce
+		e.Amount = param.amount
 		e.Era = param.era
 		e.Fee = param.fee
 		e.ExtrinsicIndex = param.extrinsicIdx
