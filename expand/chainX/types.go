@@ -2,12 +2,13 @@ package chainX
 
 import (
 	"fmt"
+	"github.com/JFJun/stafi-substrate-go/expand/base"
 	"github.com/stafiprotocol/go-substrate-rpc-client/scale"
 	"github.com/stafiprotocol/go-substrate-rpc-client/types"
 )
 
 type ChainXEventRecords struct {
-	types.EventRecords
+	base.BaseEventRecords
 	//write by flynn   扩展对chainX的支持
 	XSystem_Blacklisted                         []EventXSystemBlacklisted
 	XSystem_Unblacklisted                       []EventXSystemUnblacklisted
@@ -64,29 +65,11 @@ type ChainXEventRecords struct {
 	Currencies_Deposited                        []EventCurrenciesDeposited
 	Currencies_Withdrawn                        []EventCurrenciesWithdrawn
 	XTransactionFee_FeePaid                     []EventXTransactionFeeFeePaid
+
 	Democracy_Blacklisted                       []EventDemocracyBlacklisted
 	Elections_ElectionError                     []EventElectionsElectionError
 }
 
-type EventXMiningAssetMinted struct {
-	Phase     types.Phase
-	AccountId types.AccountID
-	Balance   types.U128
-	Topics    []types.Hash
-}
-type EventXStakingForceAllWithdrawn struct {
-	Phase     types.Phase
-	AccountId types.AccountID
-	Topics    []types.Hash
-}
-type EventXAssetsBalanceSet struct {
-	Phase     types.Phase
-	AssetId   AssetId
-	AccountId types.AccountID
-	AssetType AssetType
-	Balance   types.U128
-	Topics    []types.Hash
-}
 type EventElectionsElectionError struct {
 	Phase  types.Phase
 	Topics []types.Hash
@@ -501,8 +484,31 @@ type EventXTransactionFeeFeePaid struct {
 	Topics     []types.Hash
 }
 
+type EventXAssetsBalanceSet struct {
+	Phase     types.Phase
+	AssetId   AssetId
+	AccountId types.AccountID
+	AssetType AssetType
+	Balance   Balance
+	Topics    []types.Hash
+}
+
+type EventXStakingForceAllWithdrawn struct {
+	Phase     types.Phase
+	AccountId types.AccountID
+	Topics    []types.Hash
+}
+
+type EventXMiningAssetMinted struct {
+	Phase     types.Phase
+	AccountId types.AccountID
+	Balance   Balance
+	Topics    []types.Hash
+}
+
 //  ------------------chainX struct -------------------//
 // https://github.com/chainx-org/chainx.js-v2/blob/945a8c2f5bf7a6f058275736aad06b3a301d112f/packages/api/src/chainx/chainx-types.ts
+type Balance types.U128
 type AssetId types.U32
 type AssetType struct {
 	EnumId int
@@ -743,7 +749,6 @@ type BtcAddress types.Text
 type TradingPairId types.U32
 
 type Price types.U128
-
 type CurrencyPair struct {
 	Base  AssetId
 	Quote AssetId

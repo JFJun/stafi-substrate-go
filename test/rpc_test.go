@@ -142,6 +142,7 @@ func Test_CalcFee(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	_, value, err := md.MV.GetConstants("TransactionPayment", "TransactionByteFee")
 	if err != nil {
 		t.Fatal(err)

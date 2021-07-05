@@ -34,6 +34,8 @@ type BaseEventRecords struct {
 
 	Balances_ReserveRepatriated []EventBalancesReserveRepatriated
 	Proxy_Announced             []EventProxyAnnounced
+	Democracy_Blacklisted       []EventDemocracyBlacklisted
+	Elections_ElectionError     []EventElectionsElectionError
 }
 
 func (d *BaseEventRecords) GetBalancesTransfer() []types.EventBalancesTransfer {
@@ -164,6 +166,19 @@ type EventProxyAnnounced struct {
 	Who    types.AccountID
 	ID     types.AccountID
 	Hash   types.Hash
+	Topics []types.Hash
+}
+
+//  A proposal \[hash\] has been blacklisted permanently.
+type EventDemocracyBlacklisted struct {
+	Phase       types.Phase
+	BlackListed types.Hash
+	Topics      []types.Hash
+}
+
+//  Internal error happened while trying to perform election.
+type EventElectionsElectionError struct {
+	Phase  types.Phase
 	Topics []types.Hash
 }
 

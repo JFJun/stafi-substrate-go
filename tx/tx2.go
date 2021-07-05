@@ -197,3 +197,50 @@ func (tx *SubstrateTransaction) getEra() *types.ExtrinsicEra {
 	era.AsMortalEra.Second = second
 	return era
 }
+
+func (tx SubstrateTransaction) ReturnSign(ext *types.Extrinsic) (types.SignatureOptions, []byte, error) {
+	o := types.SignatureOptions{
+		BlockHash:          types.NewHash(types.MustHexDecodeString(tx.BlockHash)),
+		GenesisHash:        types.NewHash(types.MustHexDecodeString(tx.GenesisHash)),
+		Nonce:              types.NewUCompactFromUInt(tx.Nonce),
+		SpecVersion:        types.NewU32(tx.SpecVersion),
+		Tip:                types.NewUCompactFromUInt(tx.Tip),
+		TransactionVersion: types.NewU32(tx.TransactionVersion),
+	}
+	era := tx.getEra()
+	if era != nil {
+		o.Era = *era
+	}
+	if ext.Type() != types.ExtrinsicVersion4 {
+		return o, nil, fmt.Errorf("unsupported extrinsic version: %v (isSigned: %v, type: %v)", ext.Version, ext.IsSigned(), ext.Type())
+	}
+	mb, err := types.EncodeToBytes(ext.Method)
+	if err != nil {
+		return o, nil, err
+	}
+	eras := o.Era
+	if !o.Era.IsMortalEra {
+		eras = types.ExtrinsicEra{IsImmortalEra: true}
+	}
+	payload := types.ExtrinsicPayloadV4{
+		ExtrinsicPayloadV3: types.ExtrinsicPayloadV3{
+			Method:      mb,
+			Era:         eras,
+			Nonce:       o.Nonce,
+			Tip:         o.Tip,
+			SpecVersion: o.SpecVersion,
+			GenesisHash: o.GenesisHash,
+			BlockHash:   o.BlockHash,
+		},
+		TransactionVersion: o.TransactionVersion,
+	}
+	data, err := types.EncodeToBytes(payload)
+	if err != nil {
+		return o, nil, fmt.Errorf("encode payload error: %v", err)
+	}
+	if len(data) > 256 {
+		h := blake2b.Sum256(data)
+		data = h[:]
+	}
+	return o, data, nil
+}
