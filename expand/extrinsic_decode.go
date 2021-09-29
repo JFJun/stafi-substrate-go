@@ -229,7 +229,7 @@ func (ed *ExtrinsicDecoder) decodeCallIndex(decoder scale.Decoder) error {
 				ExtrinsicParam{
 					Name:  "value",
 					Type:  "Compact<Balance>",
-					Value: utils.UCompactToBigInt(b).Int64(),
+					Value: utils.UCompactToBigInt(b).String(),
 				})
 		}
 	case "Utility":
