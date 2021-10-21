@@ -2,19 +2,20 @@ package polkadot
 
 import (
 	"github.com/JFJun/stafi-substrate-go/expand/base"
+	"github.com/stafiprotocol/go-substrate-rpc-client/scale"
 	"github.com/stafiprotocol/go-substrate-rpc-client/types"
 )
 
 type PolkadotEventRecords struct {
-	types.EventRecords
+	base.BaseEventRecords
 	Claims_Claimed                    []EventClaimsClaimed
 	ElectionsPhragmen_VoterReported   []EventElectionsPhragmenVoterReported
 	ElectionsPhragmen_MemberRenounced []EventElectionsPhragmenMemberRenounced
 	ElectionsPhragmen_MemberKicked    []EventElectionsPhragmenMemberKicked
 	ElectionsPhragmen_ElectionError   []EventElectionsPhragmenElectionError
 	ElectionsPhragmen_EmptyTerm       []EventElectionsPhragmenEmptyTerm
-	//ElectionsPhragmen_NewTerm		[]EventElectionsPhragmenNewTerm		暂不支持解析
-	Democracy_Blacklisted []EventDemocracyBlacklisted
+	ElectionsPhragmen_NewTerm         []EventElectionsPhragmenNewTerm
+	Democracy_Blacklisted             []EventDemocracyBlacklisted
 }
 
 func (p PolkadotEventRecords) GetBalancesTransfer() []types.EventBalancesTransfer {
@@ -35,11 +36,12 @@ type EventDemocracyBlacklisted struct {
 	Topics []types.Hash
 }
 
-//type EventElectionsPhragmenNewTerm struct {
-//	Phase    types.Phase
-//	Vec
-//	Topics []types.Hash
-//}
+type EventElectionsPhragmenNewTerm struct {
+	Phase   types.Phase
+	NewTerm []PhragmenNewTermItem
+	Topics  []types.Hash
+}
+
 type EventElectionsPhragmenEmptyTerm struct {
 	Phase types.Phase
 
@@ -72,4 +74,22 @@ type EventClaimsClaimed struct {
 	EthereumAddress base.VecU8L20
 	Balance         types.U128
 	Topics          []types.Hash
+}
+
+type PhragmenNewTermItem struct {
+	AccountId types.AccountID
+	Balance   types.U128
+}
+
+func (d *PhragmenNewTermItem) Decode(decoder scale.Decoder) error {
+	err := decoder.Decode(&d.AccountId)
+	if err != nil {
+		return err
+	}
+	err = decoder.Decode(&d.Balance)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

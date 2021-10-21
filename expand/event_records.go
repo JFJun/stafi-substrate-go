@@ -1,6 +1,7 @@
 package expand
 
 import (
+	"fmt"
 	"github.com/JFJun/stafi-substrate-go/expand/acala"
 	"github.com/JFJun/stafi-substrate-go/expand/base"
 	"github.com/JFJun/stafi-substrate-go/expand/chainX"
@@ -10,6 +11,7 @@ import (
 	"github.com/JFJun/stafi-substrate-go/expand/polkadot"
 	"github.com/JFJun/stafi-substrate-go/expand/stafi"
 	"github.com/stafiprotocol/go-substrate-rpc-client/types"
+	"reflect"
 	"strings"
 )
 
@@ -68,7 +70,7 @@ func DecodeEventRecords(meta *types.Metadata, rawData string, chainName string) 
 			return nil, err
 		}
 		ier = &events
-	case "polkadot":
+	case "polkadot", "kusama":
 		var events polkadot.PolkadotEventRecords
 		err := e.DecodeEventRecords(meta, &events)
 		if err != nil {
@@ -84,4 +86,55 @@ func DecodeEventRecords(meta *types.Metadata, rawData string, chainName string) 
 		ier = &events
 	}
 	return ier, nil
+}
+
+/*
+	func:检查指定结构是否实现了Meta中的所有Event
+*/
+func CheckIsImplementedAllEvent(meta *types.Metadata, eventRecordType reflect.Type) (noImplementedEvent []string, isAllImplemented bool) {
+	eventList := GetAllImplementedEventList(eventRecordType)
+	existFunc := func(eventName string) bool {
+		for _, item := range eventList {
+			if item == eventName {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	// 获取所有没有实现的事件
+	for _, moduleItem := range meta.AsMetadataV12.Modules {
+		for _, eventItem := range moduleItem.Events {
+			eventName := fmt.Sprintf("%v_%v", moduleItem.Name, eventItem.Name)
+			if existFunc(eventName) == false {
+				noImplementedEvent = append(noImplementedEvent, eventName)
+			}
+		}
+	}
+
+	isAllImplemented = len(noImplementedEvent) <= 0
+	return
+}
+
+func GetAllImplementedEventList(tp reflect.Type) []string {
+	eventList := []string{}
+
+	_GetEventDetail(tp, &eventList)
+
+	return eventList
+}
+
+func _GetEventDetail(tp reflect.Type, eventList *[]string) {
+	for index := 0; index < tp.NumField(); index++ {
+		fieldItem := tp.Field(index)
+		if fieldItem.Type.Kind() == reflect.Array || fieldItem.Type.Kind() == reflect.Slice {
+			*eventList = append(*eventList, fieldItem.Name)
+			continue
+		}
+
+		if fieldItem.Type.Kind() == reflect.Struct || fieldItem.Type.Kind() == reflect.Ptr {
+			_GetEventDetail(fieldItem.Type, eventList)
+		}
+	}
 }

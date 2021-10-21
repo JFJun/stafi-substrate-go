@@ -35,6 +35,10 @@ type Client struct {
 }
 
 func New(url string) (*Client, error) {
+	return New2(url, true)
+}
+
+func New2(url string, noPalletIndices bool) (*Client, error) {
 	c := new(Client)
 	c.url = url
 	var err error
@@ -60,7 +64,7 @@ func New(url string) (*Client, error) {
 		c.prefix, _ = c.BasicType.GetChainPrefix(c.ChainName)
 	}
 	//设置默认地址不需要0xff
-	expand.SetSerDeOptions(true)
+	expand.SetSerDeOptions(noPalletIndices)
 	return c, nil
 }
 
@@ -171,8 +175,8 @@ func (c *Client) GetBlockByHash(blockHash string) (*models.BlockResponse, error)
 		if err != nil {
 			return nil, err
 		}
-		d, _ := json.Marshal(blockResp)
-		fmt.Println(string(d))
+		//d, _ := json.Marshal(blockResp)
+		//fmt.Println(string(d))
 		err = c.parseExtrinsicByStorage(blockHash, blockResp)
 		if err != nil {
 			return nil, err
@@ -185,6 +189,7 @@ type parseBlockExtrinsicParams struct {
 	from, to, sig, era, txid, fee string
 	nonce                         int64
 	extrinsicIdx, length          int
+	amount                        string
 }
 
 /*
@@ -249,8 +254,10 @@ func (c *Client) parseExtrinsicByDecode(extrinsics []string, blockResp *models.B
 				blockData.length = resp.Length
 				for _, param := range resp.Params {
 					if param.Name == "dest" {
-
 						blockData.to, _ = ss58.EncodeByPubHex(param.Value.(string), c.prefix)
+					}
+					if param.Name == "value" {
+						blockData.amount = param.Value.(string)
 					}
 				}
 				params = append(params, blockData)
@@ -318,6 +325,7 @@ func (c *Client) parseExtrinsicByDecode(extrinsics []string, blockResp *models.B
 		e.FromAddress = param.from
 		e.ToAddress = param.to
 		e.Nonce = param.nonce
+		e.Amount = param.amount
 		e.Era = param.era
 		e.Fee = param.fee
 		e.ExtrinsicIndex = param.extrinsicIdx

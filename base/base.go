@@ -86,6 +86,10 @@ func (bt *BasicTypes) GetChainPrefix(chainName string) ([]byte, error) {
 	}
 	for _, reg := range bt.Registry {
 		if strings.ToLower(reg.Network) == strings.ToLower(chainName) {
+			if reg.Prefix == 0 {
+				return []byte{0}, nil
+			}
+
 			return big.NewInt(reg.Prefix).Bytes(), nil
 		}
 	}
